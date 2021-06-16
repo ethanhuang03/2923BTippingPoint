@@ -4,6 +4,29 @@
         "project_name": "2923BTippingPoint",
         "target": "v5",
         "templates": {
+            "ARMS": {
+                "location": "C:\\Users\\Ethan\\AppData\\Roaming\\PROS\\templates\\ARMS@1.3.2",
+                "metadata": {
+                    "origin": "local"
+                },
+                "name": "ARMS",
+                "py/object": "pros.conductor.templates.local_template.LocalTemplate",
+                "supported_kernels": "^3.4.0",
+                "system_files": [
+                    "include\\ARMS\\arc.h",
+                    "firmware\\ARMS.a",
+                    "include\\ARMS\\purepursuit.h",
+                    "include\\ARMS\\chassis.h",
+                    "include\\ARMS\\pid.h",
+                    "include\\ARMS\\api.h",
+                    "include\\ARMS\\selector.h",
+                    "include\\ARMS\\config.h",
+                    "include\\ARMS\\odom.h"
+                ],
+                "target": "v5",
+                "user_files": [],
+                "version": "1.3.2"
+            },
             "autolib": {
                 "location": "C:\\Users\\Ethan\\AppData\\Roaming\\PROS\\templates\\autolib@0.9.3",
                 "metadata": {
