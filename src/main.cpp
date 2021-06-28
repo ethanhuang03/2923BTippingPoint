@@ -3,7 +3,6 @@
 
 Controller controller;
 
-//Green gearset, 4 in wheel diam, 11.5 in wheel track
 std::shared_ptr<ChassisController> drive;
 
 auto frontRightDrive = Motor(1);
@@ -47,6 +46,7 @@ void initialize() {
 	pros::lcd::set_text(1, "King's B | 2923B");
 	drive = ChassisControllerBuilder()
 		.withMotors(LeftDrive, RightDrive)
+		//Green gearset, 4 in wheel diam, 11.5 in wheel track
 		.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
 		.withSensors(leftEncoder, rightEncoder)
 		.withOdometry()
@@ -54,10 +54,16 @@ void initialize() {
 /*
 	drive = ChassisControllerBuilder()
 		.withMotors(LeftDrive, RightDrive)
+		//Green gearset, 4 in wheel diam, 11.5 in wheel track
 		.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
 		.withSensors(leftADI_Encoder, rightADI_Encoder)
 		// Specify the tracking wheels diam (2.75 in), track (7 in), and TPR (360)
 		.withOdometry({{2.75_in, 7_in}, quadEncoderTPR})
+		.withGains(
+			{0.001, 0, 0.0001}, // Distance controller gains
+			{0.001, 0, 0.0001}, // Turn controller gains
+			{0.001, 0, 0.0001}  // Angle controller gains (helps drive straight)
+		)
 		.buildOdometry();
 */
 }
