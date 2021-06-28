@@ -1,55 +1,39 @@
+
 #include "main.h"
 
-okapi::Controller controller;
-
-okapi::Motor frontRightDrive(1);
-okapi::Motor backRightDrive(-2);
-okapi::Motor frontLeftDrive(3);
-okapi::Motor backLeftDrive(-4);
-
-okapi::MotorGroup RightDrive({frontRightDrive, backRightDrive});
-okapi::MotorGroup LeftDrive({frontLeftDrive, backLeftDrive});
-
-okapi::IntegratedEncoder rightEncoder(backRightDrive);
-okapi::IntegratedEncoder leftEncoder(backLeftDrive);
+Controller controller;
 
 //Green gearset, 4 in wheel diam, 11.5 in wheel track
-std::shared_ptr<ChassisController> drive = ChassisControllerBuilder().withMotors(LeftDrive, RightDrive).withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR}).withSensors(leftEncoder, rightEncoder).build();
+std::shared_ptr<ChassisController> drive;
 
-okapi::ControllerButton R1(ControllerDigital::R1);
-okapi::ControllerButton R2(ControllerDigital::R2);
-okapi::ControllerButton L1(ControllerDigital::L1);
-okapi::ControllerButton L2(ControllerDigital::L2);
+auto frontRightDrive = Motor(1);
+auto backRightDrive = Motor(2);
+auto frontLeftDrive = Motor(-3);
+auto backLeftDrive = Motor(-4);
 
-okapi::ControllerButton X(ControllerDigital::X);
-okapi::ControllerButton Y(ControllerDigital::Y);
-okapi::ControllerButton A(ControllerDigital::A);
-okapi::ControllerButton B(ControllerDigital::B);
+auto RightDrive = MotorGroup({frontRightDrive, backRightDrive});
+auto LeftDrive = MotorGroup({frontLeftDrive, backLeftDrive});
 
-okapi::ControllerButton Up(ControllerDigital::up);
-okapi::ControllerButton Down(ControllerDigital::down);
-okapi::ControllerButton Left(ControllerDigital::left);
-okapi::ControllerButton Right(ControllerDigital::right);
+auto rightEncoder = IntegratedEncoder(backRightDrive);
+auto leftEncoder = IntegratedEncoder(backLeftDrive);
 
+auto leftADI_Encoder = ADIEncoder('A', 'B'); // Left encoder in ADI ports A & B
+auto rightADI_Encoder = ADIEncoder('C', 'D', true);  // Right encoder in ADI ports C & D (reversed)
 
+auto button_R1 = ControllerButton(ControllerDigital::R1);
+auto button_R2 = ControllerButton(ControllerDigital::R2);
+auto button_L1 = ControllerButton(ControllerDigital::L1);
+auto button_L2 = ControllerButton(ControllerDigital::L2);
 
-void tank_drive(){
-	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
-}
+auto button_X = ControllerButton(ControllerDigital::X);
+auto button_Y = ControllerButton(ControllerDigital::Y);
+auto button_A = ControllerButton(ControllerDigital::A);
+auto button_B = ControllerButton(ControllerDigital::B);
 
-void arcade_drive(){
-	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::leftX));
-}
-
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
+auto button_Up = ControllerButton(ControllerDigital::up);
+auto button_Down = ControllerButton(ControllerDigital::down);
+auto button_Left = ControllerButton(ControllerDigital::left);
+auto button_Right = ControllerButton(ControllerDigital::right);
 
 void initialize() {
 	/*Logger::setDefaultLogger( //log output to pros terminal
@@ -61,11 +45,34 @@ void initialize() {
 	);*/
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "King's B | 2923B");
+	drive = ChassisControllerBuilder()
+		.withMotors(LeftDrive, RightDrive)
+		.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
+		.withSensors(leftEncoder, rightEncoder)
+		.withOdometry()
+		.buildOdometry();
+/*
+	drive = ChassisControllerBuilder()
+		.withMotors(LeftDrive, RightDrive)
+		.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
+		.withSensors(leftADI_Encoder, rightADI_Encoder)
+		// Specify the tracking wheels diam (2.75 in), track (7 in), and TPR (360)
+		.withOdometry({{2.75_in, 7_in}, quadEncoderTPR})
+		.buildOdometry();
+*/
 }
 
 void disabled() {}
 
 void competition_initialize() {}
+
+void tank_drive(){
+	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
+}
+
+void arcade_drive(){
+	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::leftX));
+}
 
 void autonomous() {
 	drive->moveDistance(12_in);
