@@ -5,10 +5,10 @@ Controller controller;
 
 std::shared_ptr<ChassisController> drive;
 
-auto frontRightDrive = Motor(1);
-auto backRightDrive = Motor(2);
-auto frontLeftDrive = Motor(-3);
-auto backLeftDrive = Motor(-4);
+auto frontRightDrive = Motor(-1);
+auto backRightDrive = Motor(-2);
+auto frontLeftDrive = Motor(3);
+auto backLeftDrive = Motor(4);
 
 auto RightDrive = MotorGroup({frontRightDrive, backRightDrive});
 auto LeftDrive = MotorGroup({frontLeftDrive, backLeftDrive});
@@ -43,7 +43,7 @@ void initialize() {
 		)
 	);*/
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "King's B | 2923B");
+	pros::lcd::set_text(0, "King's B | 2923B");
 	drive = ChassisControllerBuilder()
 		.withMotors(LeftDrive, RightDrive)
 		//Green gearset, 4 in wheel diam, 11.5 in wheel track
@@ -73,6 +73,7 @@ void disabled() {}
 void competition_initialize() {}
 
 void tank_drive(){
+	pros::lcd::set_text(1, "Tank Drive");
 	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
 }
 
@@ -86,8 +87,11 @@ void autonomous() {
 }
 
 void opcontrol() {
-	tank_drive();
-	//arcade_drive();
+	while(true){
+		pros::lcd::set_text(2, "Tankasdf Drive");
+		tank_drive();
+		//arcade_drive();
 
-	pros::delay(10);
+		pros::delay(10);
+	}
 }
