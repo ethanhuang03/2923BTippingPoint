@@ -1,5 +1,5 @@
-
 #include "main.h"
+#include "ARMS/api.h"
 
 Controller controller;
 
@@ -43,6 +43,7 @@ void initialize() {
 		)
 	);*/
 	pros::lcd::initialize();
+	selector::init();
 	pros::lcd::set_text(0, "King's B | 2923B");
 	drive = ChassisControllerBuilder()
 		.withMotors(LeftDrive, RightDrive)
@@ -82,8 +83,22 @@ void arcade_drive(){
 }
 
 void autonomous() {
-	drive->moveDistance(12_in);
-	drive->turnAngle(90_deg);
+	if(selector::auton == 1){ //Red Front
+		drive->moveDistance(12_in);
+		drive->turnAngle(90_deg);
+	}
+	else if(selector::auton == 2){ //Red Back
+	}
+	else if(selector::auton == 3){ //Do Nothing
+	}
+	else if(selector::auton == -1){ //Blue Front
+	}
+	else if(selector::auton == -2){ //Blue Back
+	}
+	else if(selector::auton == -3){ //Do Nothing
+	}
+	else if(selector::auton == 0){ //Skills
+	}
 }
 
 void opcontrol() {
