@@ -10,9 +10,9 @@ auto frontRightDrive = Motor(2);
 auto backLeftDrive = Motor(-3);
 auto frontLeftDrive = Motor(-4);
 
-auto intake = Motor(5);
-auto mogo = Motor(6);
-auto lift = Motor(7);
+auto lift = Motor(5);
+auto intake = Motor(6);
+auto mogo = Motor(7);
 auto clamp = Motor(8);
 
 auto RightDrive = MotorGroup({frontRightDrive, backRightDrive});
