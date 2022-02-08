@@ -5,19 +5,21 @@ Controller controller;
 
 std::shared_ptr<ChassisController> drive;
 
-auto frontRightDrive = Motor(-1);
-auto backRightDrive = Motor(-2);
-auto frontLeftDrive = Motor(3);
-auto backLeftDrive = Motor(4);
+auto backRightDrive = Motor(1);
+auto frontRightDrive = Motor(2);
+auto backLeftDrive = Motor(-3);
+auto frontLeftDrive = Motor(-4);
+
+auto intake = Motor(5);
+auto mogo = Motor(6);
+auto lift = Motor(7);
+auto clamp = Motor(8);
 
 auto RightDrive = MotorGroup({frontRightDrive, backRightDrive});
 auto LeftDrive = MotorGroup({frontLeftDrive, backLeftDrive});
 
 auto rightEncoder = IntegratedEncoder(backRightDrive);
 auto leftEncoder = IntegratedEncoder(backLeftDrive);
-
-auto leftADI_Encoder = ADIEncoder('A', 'B'); // Left encoder in ADI ports A & B
-auto rightADI_Encoder = ADIEncoder('C', 'D', true);  // Right encoder in ADI ports C & D (reversed)
 
 auto button_R1 = ControllerButton(ControllerDigital::R1);
 auto button_R2 = ControllerButton(ControllerDigital::R2);
@@ -49,29 +51,14 @@ void initialize() {
 		.withMotors(LeftDrive, RightDrive)
 		//Green gearset, 4 in wheel diam, 11.5 in wheel track
 		.withDimensions(AbstractMotor::gearset::green, {{4_in, 15_in}, imev5GreenTPR})
-		.withSensors(leftEncoder, rightEncoder)
-		.withOdometry({{4_in, 15_in}, quadEncoderTPR}) // or .withOdometry()
+		.withSensors(leftEncoder, rightEncoder) //.withSensors(leftADI_Encoder, rightADI_Encoder)
+		.withOdometry() // or .withOdometry({{4_in, 15_in}, quadEncoderTPR})
 		.withGains(
 			{0, 0, 0}, // Distance controller gains
 			{0, 0, 0}, // Turn controller gains
 			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
 		.buildOdometry();
-/*
-	drive = ChassisControllerBuilder()
-		.withMotors(LeftDrive, RightDrive)
-		//Green gearset, 4 in wheel diam, 11.5 in wheel track
-		.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
-		.withSensors(leftADI_Encoder, rightADI_Encoder)
-		// Specify the tracking wheels diam (2.75 in), track (7 in), and TPR (360)
-		.withOdometry({{2.75_in, 7_in}, quadEncoderTPR})
-		.withGains(
-			{0.001, 0, 0.0001}, // Distance controller gains
-			{0.001, 0, 0.0001}, // Turn controller gains
-			{0.001, 0, 0.0001}  // Angle controller gains (helps drive straight)
-		)
-		.buildOdometry();
-*/
 }
 
 void disabled() {}
@@ -137,206 +124,106 @@ void autonomous() {
 	}
 }
 
-void R1(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void R2(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void L1(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void L2(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void X(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void Y(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void A(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void B(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void Up(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void Down(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void Left(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void Right(bool run){
-	if(run){
-
-	}
-	else{
-
-	}
-}
-
-void button_macros(){
+void R1(){
 	if(button_R1.isPressed()){
-		R1(true);
 	}
 	else{
-		R1(false);
 	}
+}
 
+void R2(){
 	if(button_R2.isPressed()){
-		R2(true);
 	}
 	else{
-		R2(false);
 	}
+}
 
+void L1(){
 	if(button_L1.isPressed()){
-		L1(true);
 	}
 	else{
-		L1(false);
 	}
+}
 
+void L2(){
 	if(button_L2.isPressed()){
-		L2(true);
 	}
 	else{
-		L2(false);
 	}
+}
 
+void X(){
 	if(button_X.isPressed()){
-		X(true);
 	}
 	else{
-		X(false);
 	}
+}
 
+void Y(){
 	if(button_Y.isPressed()){
-		Y(true);
 	}
 	else{
-		Y(false);
 	}
+}
 
+void A(){
 	if(button_A.isPressed()){
-		A(true);
 	}
 	else{
-		A(false);
 	}
+}
 
+void B(){
 	if(button_B.isPressed()){
-		B(true);
 	}
 	else{
-		B(false);
 	}
+}
 
+void Up(){
 	if(button_Up.isPressed()){
-		Up(true);
 	}
 	else{
-		Up(false);
 	}
+}
 
+void Down(){
 	if(button_Down.isPressed()){
-		Down(true);
 	}
 	else{
-		Down(false)
 	}
+}
 
+void Left(){
 	if(button_Left.isPressed()){
-		Left(true);
 	}
 	else{
-		Left(false);
 	}
+}
 
+void Right(){
 	if(button_Right.isPressed()){
-		Right(true);
 	}
 	else{
-		Right(false);
 	}
 }
 
 void opcontrol() {
 	pros::lcd::set_text(2, "User Control");
 	while(true){
-		tank_drive(); //arcade_drive();
-		button_macros();
-
+		tank_drive();
+		R1();
+		R2();
+		L1();
+		L2();
+		X();
+		Y();
+		A();
+		B();
+		Up();
+		Down();
+		Left();
+		Right();
 		pros::delay(10);
 	}
 
