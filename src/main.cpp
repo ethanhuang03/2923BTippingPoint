@@ -15,6 +15,8 @@ auto intake = Motor(6);
 auto mogo = Motor(7);
 auto clamp = Motor(8);
 
+bool clamp_flag = 0;
+
 auto RightDrive = MotorGroup({frontRightDrive, backRightDrive});
 auto LeftDrive = MotorGroup({frontLeftDrive, backLeftDrive});
 
@@ -126,43 +128,60 @@ void autonomous() {
 
 void R1(){
 	if(button_R1.isPressed()){
+		intake.moveVelocity(100);
 	}
 	else{
+		intake.moveVelocity(0);
 	}
 }
 
 void R2(){
 	if(button_R2.isPressed()){
+		intake.moveVelocity(-100);
 	}
 	else{
+		intake.moveVelocity(0);
 	}
 }
 
 void L1(){
 	if(button_L1.isPressed()){
+		mogo.moveVelocity(100);
 	}
 	else{
+		mogo.moveVelocity(0);
 	}
 }
 
 void L2(){
 	if(button_L2.isPressed()){
+		mogo.moveVelocity(-100);
 	}
 	else{
+		mogo.moveVelocity(0);
 	}
 }
 
 void X(){
 	if(button_X.isPressed()){
+		clamp_flag = 0;
+		clamp.moveVelocity(-100);
 	}
 	else{
+		clamp.moveVelocity(100);
 	}
 }
 
 void Y(){
+	if (clamp_flag) {
+		clamp.moveVelocity(100);
+	}
 	if(button_Y.isPressed()){
+		clamp_flag = 1;
+		clamp.moveVelocity(100);
 	}
 	else{
+		clamp.moveVelocity(0);
 	}
 }
 
@@ -182,15 +201,19 @@ void B(){
 
 void Up(){
 	if(button_Up.isPressed()){
+		lift.moveVelocity(100);
 	}
 	else{
+		lift.moveVelocity(0);
 	}
 }
 
 void Down(){
 	if(button_Down.isPressed()){
+		lift.moveVelocity(100);
 	}
 	else{
+		lift.moveVelocity(0);
 	}
 }
 
