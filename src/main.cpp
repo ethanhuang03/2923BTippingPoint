@@ -126,64 +126,7 @@ void autonomous() {
 	}
 }
 
-void R1(){
-	if(button_R1.isPressed()){
-		intake.moveVelocity(100);
-	}
-	else{
-		intake.moveVelocity(0);
-	}
-}
 
-void R2(){
-	if(button_R2.isPressed()){
-		intake.moveVelocity(-100);
-	}
-	else{
-		intake.moveVelocity(0);
-	}
-}
-
-void L1(){
-	if(button_L1.isPressed()){
-		mogo.moveVelocity(100);
-	}
-	else{
-		mogo.moveVelocity(0);
-	}
-}
-
-void L2(){
-	if(button_L2.isPressed()){
-		mogo.moveVelocity(-100);
-	}
-	else{
-		mogo.moveVelocity(0);
-	}
-}
-
-void X(){
-	if(button_X.isPressed()){
-		clamp_flag = 0;
-		clamp.moveVelocity(-100);
-	}
-	else{
-		clamp.moveVelocity(100);
-	}
-}
-
-void Y(){
-	if (clamp_flag) {
-		clamp.moveVelocity(100);
-	}
-	if(button_Y.isPressed()){
-		clamp_flag = 1;
-		clamp.moveVelocity(100);
-	}
-	else{
-		clamp.moveVelocity(0);
-	}
-}
 
 void A(){
 	if(button_A.isPressed()){
@@ -196,24 +139,6 @@ void B(){
 	if(button_B.isPressed()){
 	}
 	else{
-	}
-}
-
-void Up(){
-	if(button_Up.isPressed()){
-		lift.moveVelocity(100);
-	}
-	else{
-		lift.moveVelocity(0);
-	}
-}
-
-void Down(){
-	if(button_Down.isPressed()){
-		lift.moveVelocity(100);
-	}
-	else{
-		lift.moveVelocity(0);
 	}
 }
 
@@ -235,19 +160,49 @@ void opcontrol() {
 	pros::lcd::set_text(2, "User Control");
 	while(true){
 		tank_drive();
-		R1();
-		R2();
-		L1();
-		L2();
-		X();
-		Y();
-		A();
-		B();
-		Up();
-		Down();
-		Left();
-		Right();
+		if(button_R1.isPressed()){
+			intake.moveVelocity(-100);
+		}
+		else if(button_R2.isPressed()){
+			intake.moveVelocity(100);
+		}
+		else{
+			intake.moveVelocity(0);
+		}
+
+		if(button_L1.isPressed()){
+			mogo.moveVelocity(100);
+		}
+		else if(button_L2.isPressed()){
+			mogo.moveVelocity(-100);
+		}
+		else{
+			mogo.moveVelocity(0);
+		}
+
+		if(button_X.isPressed()){
+			clamp_flag = 0;
+			clamp.moveVelocity(-100);
+		}
+		else if(button_Y.isPressed()){
+			clamp_flag = 1;
+			clamp.moveVelocity(100);
+		}
+		else{
+			clamp.moveVelocity(0);
+		}
+
+		if(button_Up.isPressed()){
+			lift.moveVelocity(100);
+		}
+		else if(button_Down.isPressed()){
+			lift.moveVelocity(-100);
+		}
+		else{
+			lift.moveVelocity(0);
+		}
+
 		pros::delay(10);
 	}
-
+//y, r2, l2, dwn
 }
