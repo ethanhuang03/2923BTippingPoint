@@ -5,10 +5,10 @@ Controller controller;
 
 std::shared_ptr<ChassisController> drive;
 
-auto backRightDrive = Motor(1);
-auto frontRightDrive = Motor(2);
-auto backLeftDrive = Motor(-3);
-auto frontLeftDrive = Motor(-4);
+auto backRightDrive = Motor(-1);
+auto frontRightDrive = Motor(-2);
+auto backLeftDrive = Motor(3);
+auto frontLeftDrive = Motor(4);
 
 auto lift = Motor(5);
 auto intake = Motor(6);
@@ -126,36 +126,6 @@ void autonomous() {
 	}
 }
 
-
-
-void A(){
-	if(button_A.isPressed()){
-	}
-	else{
-	}
-}
-
-void B(){
-	if(button_B.isPressed()){
-	}
-	else{
-	}
-}
-
-void Left(){
-	if(button_Left.isPressed()){
-	}
-	else{
-	}
-}
-
-void Right(){
-	if(button_Right.isPressed()){
-	}
-	else{
-	}
-}
-
 void opcontrol() {
 	pros::lcd::set_text(2, "User Control");
 	while(true){
@@ -204,5 +174,4 @@ void opcontrol() {
 
 		pros::delay(10);
 	}
-//y, r2, l2, dwn
 }
