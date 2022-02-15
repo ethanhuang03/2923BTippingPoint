@@ -1,7 +1,8 @@
 #include "main.h"
 #include "ARMS/api.h"
 
-Controller controller;
+Controller master(ControllerId::master);
+Controller partner(ControllerId::partner);
 
 std::shared_ptr<ChassisController> drive;
 
@@ -15,28 +16,11 @@ auto intake = Motor(6);
 auto mogo = Motor(7);
 auto clamp = Motor(8);
 
-bool clamp_flag = 0;
-
 auto RightDrive = MotorGroup({frontRightDrive, backRightDrive});
 auto LeftDrive = MotorGroup({frontLeftDrive, backLeftDrive});
 
 auto rightEncoder = IntegratedEncoder(backRightDrive);
 auto leftEncoder = IntegratedEncoder(backLeftDrive);
-
-auto button_R1 = ControllerButton(ControllerDigital::R1);
-auto button_R2 = ControllerButton(ControllerDigital::R2);
-auto button_L1 = ControllerButton(ControllerDigital::L1);
-auto button_L2 = ControllerButton(ControllerDigital::L2);
-
-auto button_X = ControllerButton(ControllerDigital::X);
-auto button_Y = ControllerButton(ControllerDigital::Y);
-auto button_A = ControllerButton(ControllerDigital::A);
-auto button_B = ControllerButton(ControllerDigital::B);
-
-auto button_Up = ControllerButton(ControllerDigital::up);
-auto button_Down = ControllerButton(ControllerDigital::down);
-auto button_Left = ControllerButton(ControllerDigital::left);
-auto button_Right = ControllerButton(ControllerDigital::right);
 
 void initialize() {
 	/*Logger::setDefaultLogger( //log output to pros terminal
@@ -69,12 +53,12 @@ void competition_initialize() {}
 
 void tank_drive(){
 	pros::lcd::set_text(1, "Tank Drive");
-	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
+	drive->getModel()->tank(master.getAnalog(ControllerAnalog::leftY), master.getAnalog(ControllerAnalog::rightY));
 }
 
 void arcade_drive(){
 	pros::lcd::set_text(1, "Arcade Drive");
-	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::leftX));
+	drive->getModel()->arcade(master.getAnalog(ControllerAnalog::leftY), master.getAnalog(ControllerAnalog::leftX));
 }
 
 void red_front(){
@@ -130,42 +114,40 @@ void opcontrol() {
 	pros::lcd::set_text(2, "User Control");
 	while(true){
 		tank_drive();
-		if(button_R1.isPressed()){
+		if(partner.getDigital(ControllerDigital::R1)){
 			intake.moveVelocity(-100);
 		}
-		else if(button_R2.isPressed()){
+		else if(partner.getDigital(ControllerDigital::R2)){
 			intake.moveVelocity(100);
 		}
 		else{
 			intake.moveVelocity(0);
 		}
 
-		if(button_L1.isPressed()){
+		if(partner.getDigital(ControllerDigital::L1)){
 			mogo.moveVelocity(100);
 		}
-		else if(button_L2.isPressed()){
+		else if(partner.getDigital(ControllerDigital::L1)){
 			mogo.moveVelocity(-100);
 		}
 		else{
 			mogo.moveVelocity(0);
 		}
 
-		if(button_X.isPressed()){
-			clamp_flag = 0;
+		if(partner.getDigital(ControllerDigital::X)){
 			clamp.moveVelocity(-100);
 		}
-		else if(button_Y.isPressed()){
-			clamp_flag = 1;
+		else if(partner.getDigital(ControllerDigital::Y)){
 			clamp.moveVelocity(100);
 		}
 		else{
 			clamp.moveVelocity(0);
 		}
 
-		if(button_Up.isPressed()){
+		if(partner.getDigital(ControllerDigital::up)){
 			lift.moveVelocity(100);
 		}
-		else if(button_Down.isPressed()){
+		else if(partner.getDigital(ControllerDigital::down)){
 			lift.moveVelocity(-100);
 		}
 		else{
