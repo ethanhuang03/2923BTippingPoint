@@ -64,7 +64,8 @@ namespace pid {
 // Auton selector configuration constants
 namespace selector {
 // Names of autonomi, up to 10
-#define AUTONS "Front", "Back", "Do Nothing"
+#define AUTONS "Left", "Left and Middle", "Right", "Right and Middle", "Middle (From Left)", "Middle (From Right)"
+#define AUTONSBAK "Front", "Back", "Do Nothing"
 #define HUE 360   // Color of theme from 0-359(H part of HSV)
 #define DEFAULT 1 // Default auton numbers
 } // namespace selector
