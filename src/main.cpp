@@ -24,12 +24,12 @@ auto rightRotationSensor = RotationSensor(10, true);
 
 auto bumper0 = ADIButton('A');
 auto bumper1 = ADIButton('B');
-pros::ADIDigitalOut clamp_left('C');
-pros::ADIDigitalOut clamp_right('D');
-pros::ADIDigitalOut mogotilt_left('E');
-pros::ADIDigitalOut mogotilt_right('F');
-pros::ADIDigitalOut clampkiller('G');
-pros::ADIDigitalOut piston2('H');
+pros::ADIDigitalOut clamp('C');
+pros::ADIDigitalOut mogotilt_left('D');
+pros::ADIDigitalOut mogotilt_right('E');
+pros::ADIDigitalOut clampkiller('F');
+pros::ADIDigitalOut wing0('G');
+pros::ADIDigitalOut wing1('H');
 
 void initialize() {
 	pros::lcd::initialize();
@@ -85,7 +85,13 @@ void autonomous() {
 	else if(selector::auton == 6) { // Red Middle (From Right)
 
 	}
-	if(selector::auton == -1) { // Blue Left
+	else if(selector::auton == 7) { // Two Goals (Left)
+
+	}
+	else if(selector::auton == 8) { // Two Goals (Right)
+
+	}
+	else if(selector::auton == -1) { // Blue Left
 
 	}
 	else if(selector::auton == -2) { // Blue Left and Middle
@@ -101,6 +107,12 @@ void autonomous() {
 
 	}
 	else if(selector::auton == -6) { // Blue Middle (From Right)
+
+	}
+	else if(selector::auton == -7) { // Two Goals (Left)
+
+	}
+	else if(selector::auton == -8) { // Two Goals (Right)
 
 	}
 	else if(selector::auton == 0){ //Skills
