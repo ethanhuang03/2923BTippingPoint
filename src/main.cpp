@@ -5,6 +5,7 @@ Controller master(ControllerId::master);
 Controller partner(ControllerId::partner);
 
 std::shared_ptr<ChassisController> drive;
+std::shared_ptr<AsyncMotionProfileController> driveController;
 
 auto backRightDrive = Motor(-1);
 auto frontRightDrive = Motor(-2);
@@ -20,16 +21,18 @@ auto LeftDrive = MotorGroup({frontLeftDrive, backLeftDrive, topLeftDrive});
 
 auto leftRotationSensor = RotationSensor(9);
 auto rightRotationSensor = RotationSensor(10, true);
+auto centerRotationSensor(11);
 //auto interialSensor = IMU(11);
 
 auto bumper0 = ADIButton('A');
 auto bumper1 = ADIButton('B');
-pros::ADIDigitalOut clamp('C');
-pros::ADIDigitalOut mogotilt_left('D');
-pros::ADIDigitalOut mogotilt_right('E');
-pros::ADIDigitalOut clampkiller('F');
-pros::ADIDigitalOut wing0('G');
-pros::ADIDigitalOut wing1('H');
+
+pros::ADIDigitalOut frontClamp('C');
+pros::ADIDigitalOut backClamp('D');
+pros::ADIDigitalOut tilt('E');
+pros::ADIDigitalOut flap('F');
+pros::ADIDigitalOut wings('G');
+
 
 void initialize() {
 	pros::lcd::initialize();
@@ -42,6 +45,7 @@ void initialize() {
 		.withSensors(
 			leftRotationSensor,
 			rightRotationSensor
+			// centerRotationSensor
 		)
 		// specify the tracking wheels diameter (2.75 in), track (7 in), and TPR (360)
     .withOdometry({{2.75_in, 7_in}, quadEncoderTPR})
@@ -50,7 +54,33 @@ void initialize() {
 			{0.00295, 0, 0.000090}, // Turn controller gains 0.00295
 			{0.002, 0, 0.0001}  // Angle controller gains (helps drive straight)
 		)
+		// Stuff Below Here is Experimental
+		.withDerivativeFilters(
+        std::make_unique<AverageFilter<3>>(), // Distance controller filter
+        std::make_unique<AverageFilter<3>>(), // Turn controller filter
+        std::make_unique<AverageFilter<3>>()  // Angle controller filter
+    )
+		.withClosedLoopControllerTimeUtil(50, 5, 250_ms) // The minimum error to be considered settled, error derivative to be considered settled, time within atTargetError to be considered settled
+		.withLogger(
+        std::make_shared<Logger>(
+            TimeUtilFactory::createDefault().getTimer(), // It needs a Timer
+            "/ser/sout", // Output to the PROS terminal
+            Logger::LogLevel::debug // Most verbose log level
+        )
+    )
 		.buildOdometry();
+
+		std::shared_ptr<AsyncMotionProfileController> driveController =
+		  AsyncMotionProfileControllerBuilder()
+				/*
+		    .withLimits({
+		      1.0, // Maximum linear velocity of the Chassis in m/s
+		      2.0, // Maximum linear acceleration of the Chassis in m/s/s
+		      10.0 // Maximum linear jerk of the Chassis in m/s/s/s
+		    })
+				*/
+		    .withOutput(drive)
+		    .buildMotionProfileController();
 }
 
 void disabled() {}
@@ -85,10 +115,10 @@ void autonomous() {
 	else if(selector::auton == 6) { // Red Middle (From Right)
 
 	}
-	else if(selector::auton == 7) { // Two Goals (Left)
+	else if(selector::auton == 7) { // Wings (Left)
 
 	}
-	else if(selector::auton == 8) { // Two Goals (Right)
+	else if(selector::auton == 8) { // Wings (Right)
 
 	}
 	else if(selector::auton == -1) { // Blue Left
@@ -109,10 +139,10 @@ void autonomous() {
 	else if(selector::auton == -6) { // Blue Middle (From Right)
 
 	}
-	else if(selector::auton == -7) { // Two Goals (Left)
+	else if(selector::auton == -7) { // Wings (Left)
 
 	}
-	else if(selector::auton == -8) { // Two Goals (Right)
+	else if(selector::auton == -8) { // Wings (Right)
 
 	}
 	else if(selector::auton == 0){ //Skills
@@ -139,12 +169,10 @@ void opcontrol() {
 
 		// clamp
 		if(master.getDigital(ControllerDigital::Y) || partner.getDigital(ControllerDigital::Y)) {
-			clamp_left.set_value(true);
-			clamp_right.set_value(true);
+			frontClamp.set_value(true);
 		}
 		else if(master.getDigital(ControllerDigital::B) || partner.getDigital(ControllerDigital::B)) {
-			clamp_left.set_value(false);
-			clamp_right.set_value(false);
+			frontClamp.set_value(false);
 		}
 
 		// MOGO stuff
@@ -162,22 +190,24 @@ void opcontrol() {
 		// mogo grab and tilt
 		if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
 			// pull in and tilt
-			mogotilt_left.set_value(false);
-			mogotilt_right.set_value(false);
+			backClamp.set_value(false);
+			pros::delay(500);
+			tilt.set_value(false);
 		}
 		else if(master.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
 			// push out and release
-			mogotilt_left.set_value(true);
-			mogotilt_right.set_value(true);
+			tilt.set_value(true);
+			pros::delay(500);
+			backClamp.set_value(true);
 		}
 
 		// the uncreachable buttons
 		// clamp killer / top ring scorer
 		if(master.getDigital(ControllerDigital::up) || partner.getDigital(ControllerDigital::up)) {
-			clampkiller.set_value(true);
+			flap.set_value(true);
 		}
 		else if(master.getDigital(ControllerDigital::left) || partner.getDigital(ControllerDigital::left)) {
-			clampkiller.set_value(false);
+			flap.set_value(false);
 		}
 
 		// some safety features?
