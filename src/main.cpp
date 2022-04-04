@@ -7,11 +7,11 @@ Controller partner(ControllerId::partner);
 std::shared_ptr<ChassisController> drive;
 std::shared_ptr<AsyncMotionProfileController> driveController;
 
-auto backRightDrive = Motor(-1);
-auto frontRightDrive = Motor(-2);
+auto backRightDrive = Motor(1);
+auto frontRightDrive = Motor(2);
 auto topRightDrive = Motor(3);
-auto backLeftDrive = Motor(4);
-auto frontLeftDrive = Motor(5);
+auto backLeftDrive = Motor(-4);
+auto frontLeftDrive = Motor(-5);
 auto topLeftDrive = Motor(-6);
 auto intake = Motor(7);
 auto lift = Motor(8);
