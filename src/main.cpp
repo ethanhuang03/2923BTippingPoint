@@ -1,5 +1,5 @@
 #include "main.h"
-#include "ARMS/api.h"
+#include "autoSelect/selection.h"
 
 Controller master(ControllerId::master);
 Controller partner(ControllerId::partner);
