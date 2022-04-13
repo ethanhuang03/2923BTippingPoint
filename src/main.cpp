@@ -7,25 +7,25 @@ Controller partner(ControllerId::partner);
 std::shared_ptr<ChassisController> drive;
 std::shared_ptr<AsyncMotionProfileController> driveController;
 
-auto backRightDrive = Motor(1);
-auto frontRightDrive = Motor(2);
-auto topRightDrive = Motor(3);
-auto backLeftDrive = Motor(-4);
-auto frontLeftDrive = Motor(-5);
-auto topLeftDrive = Motor(-6);
-auto intake = Motor(7);
-auto lift = Motor(8);
+Motor backRightDrive(1);
+Motor frontRightDrive(2);
+Motor topRightDrive(3);
+Motor backLeftDrive(-4);
+Motor frontLeftDrive(-5);
+Motor topLeftDrive(-6);
+Motor intake(7);
+Motor lift(8);
 
-auto RightDrive = MotorGroup({frontRightDrive, backRightDrive, topRightDrive});
-auto LeftDrive = MotorGroup({frontLeftDrive, backLeftDrive, topLeftDrive});
+MotorGroup RightDrive({frontRightDrive, backRightDrive, topRightDrive});
+MotorGroup LeftDrive({frontLeftDrive, backLeftDrive, topLeftDrive});
 
-auto leftRotationSensor = RotationSensor(9);
-auto rightRotationSensor = RotationSensor(10, true);
-auto centerRotationSensor(11);
-//auto interialSensor = IMU(11);
+RotationSensor leftRotationSensor(9);
+RotationSensor rightRotationSensor(10, true);
+RotationSensor centerRotationSensor(11);
+//IMU interialSensor(11);
 
-auto bumper0 = ADIButton('A');
-auto bumper1 = ADIButton('B');
+ADIButton bumper0('A');
+ADIButton bumper1('B');
 
 pros::ADIDigitalOut frontClamp('C');
 pros::ADIDigitalOut backClamp('D');
@@ -39,6 +39,13 @@ void initialize() {
 	selector::init();
 	pros::lcd::set_text(0, "King's B | 2923B");
 	drive = ChassisControllerBuilder()
+		.withLogger(
+			std::make_shared<Logger>(
+				TimeUtilFactory::createDefault().getTimer(), // It needs a Timer
+				"/ser/sout", // Output to the PROS terminal
+				Logger::LogLevel::debug // Most verbose log level
+			)
+		)
 		.withMotors(LeftDrive, RightDrive)
 		//Green gearset, 4 in wheel diam, 11.5 in wheel track
 		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 13.7795_in}, imev5BlueTPR})
@@ -48,7 +55,8 @@ void initialize() {
 			// centerRotationSensor
 		)
 		// specify the tracking wheels diameter (2.75 in), track (7 in), and TPR (360)
-    .withOdometry({{2.75_in, 7_in}, quadEncoderTPR})
+		// specify the middle encoder distance (1 in) and diameter (2.75 in)
+    	.withOdometry({{2.75_in, 7_in, 1_in, 2.75_in}, quadEncoderTPR})
 		.withGains(
 			{0.002, 0, 0.000197}, // Distance controller gains
 			{0.00295, 0, 0.000090}, // Turn controller gains 0.00295
@@ -56,31 +64,24 @@ void initialize() {
 		)
 		// Stuff Below Here is Experimental
 		.withDerivativeFilters(
-        std::make_unique<AverageFilter<3>>(), // Distance controller filter
-        std::make_unique<AverageFilter<3>>(), // Turn controller filter
-        std::make_unique<AverageFilter<3>>()  // Angle controller filter
-    )
+			std::make_unique<AverageFilter<3>>(), // Distance controller filter
+			std::make_unique<AverageFilter<3>>(), // Turn controller filter
+			std::make_unique<AverageFilter<3>>()  // Angle controller filter
+		)
 		.withClosedLoopControllerTimeUtil(50, 5, 250_ms) // The minimum error to be considered settled, error derivative to be considered settled, time within atTargetError to be considered settled
-		.withLogger(
-        std::make_shared<Logger>(
-            TimeUtilFactory::createDefault().getTimer(), // It needs a Timer
-            "/ser/sout", // Output to the PROS terminal
-            Logger::LogLevel::debug // Most verbose log level
-        )
-    )
 		.buildOdometry();
 
-		std::shared_ptr<AsyncMotionProfileController> driveController =
-		  AsyncMotionProfileControllerBuilder()
-			/*
-		    .withLimits({
-		      1.0, // Maximum linear velocity of the Chassis in m/s
-		      2.0, // Maximum linear acceleration of the Chassis in m/s/s
-		      10.0 // Maximum linear jerk of the Chassis in m/s/s/s
-		    })
-			*/
-		    .withOutput(drive)
-		    .buildMotionProfileController();
+	std::shared_ptr<AsyncMotionProfileController> driveController =
+		AsyncMotionProfileControllerBuilder()
+		/*
+		.withLimits({
+			1.0, // Maximum linear velocity of the Chassis in m/s
+			2.0, // Maximum linear acceleration of the Chassis in m/s/s
+			10.0 // Maximum linear jerk of the Chassis in m/s/s/s
+		})
+		*/
+		.withOutput(drive)
+		.buildMotionProfileController();
 }
 
 void disabled() {}
@@ -96,54 +97,86 @@ void skills() {
 
 }
 
+void left() {
+
+}
+
+void left_middle() {
+
+}
+
+void right() {
+
+}
+
+void right_middle() {
+
+}
+
+void middle_left() {
+
+}
+
+void middle_right() {
+
+}
+
+void wings_left() {
+
+}
+
+void wings_right() {
+
+}
+
 void autonomous() {
 	if(selector::auton == 1) { // Red Left
-
+		left();
 	}
 	else if(selector::auton == 2) { // Red Left and Middle
-
+		left_middle();
 	}
 	else if(selector::auton == 3){ // Red Right
-
+		right();
 	}
 	else if(selector::auton == 4) { // Red Right and Middle
-
+		right_middle();
 	}
 	else if(selector::auton == 5) { // Red Middle (From Left)
-
+		middle_left();
 	}
 	else if(selector::auton == 6) { // Red Middle (From Right)
-
+		middle_right();
 	}
 	else if(selector::auton == 7) { // Wings (Left)
-
+		wings_left();
 	}
 	else if(selector::auton == 8) { // Wings (Right)
-
+		wings_right();
 	}
 	else if(selector::auton == -1) { // Blue Left
-
+		left();
 	}
 	else if(selector::auton == -2) { // Blue Left and Middle
-
+		left_middle();
 	}
 	else if(selector::auton == -3){ // Blue Right
-
+		right();
 	}
 	else if(selector::auton == -4) { // Blue Right and Middle
-
+		right_middle();
 	}
 	else if(selector::auton == -5) { // Blue Middle (From Left)
-
+		middle_left();
 	}
 	else if(selector::auton == -6) { // Blue Middle (From Right)
-
+		middle_right();
 	}
 	else if(selector::auton == -7) { // Wings (Left)
-
+		wings_left();
 	}
 	else if(selector::auton == -8) { // Wings (Right)
-
+		wings_right();
 	}
 	else if(selector::auton == 0){ //Skills
 		skills();
@@ -155,7 +188,7 @@ void opcontrol() {
 	while(true){
 		tank_drive(master);
 
-		// Goal related stuff on the right hand
+		// Front Goal related stuff on the right hand
 		// lift
 		if(master.getDigital(ControllerDigital::R1) || partner.getDigital(ControllerDigital::R1)) {
 			lift.moveVelocity(100);
@@ -190,7 +223,7 @@ void opcontrol() {
 		// mogo grab and tilt
 		if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
 			// pull in and tilt
-			backClamp.set_value(false);
+			backClamp.set_value(true);
 			pros::delay(500);
 			tilt.set_value(false);
 		}
@@ -198,7 +231,7 @@ void opcontrol() {
 			// push out and release
 			tilt.set_value(true);
 			pros::delay(500);
-			backClamp.set_value(true);
+			backClamp.set_value(false);
 		}
 
 		// the uncreachable buttons
