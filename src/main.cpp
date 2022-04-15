@@ -179,60 +179,82 @@ void skills() {
 }
 
 void left() {
-
+	drive->driveToPoint({3.7_ft, 0.7_ft}); // goal around half a foot
+	if (frontBumper.isPressed()) {
+		frontClamp.set_value(true); // clamp the goal
+		pros::delay(200);
+		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
+	}
+	drive->driveToPoint({1_ft, 3.5_ft}, true); // good position
 }
 
 void left_middle() {
-
-}
-
-void right() {
-	drive->driveToPoint({3.6_ft, 0_ft}); // goal around half a foot
-	pros::delay(200);
-	frontClamp.set_value(true);
-	pros::delay(200);
+	drive->driveToPoint({3.7_ft, 0.7_ft}); // goal around half a foot
 	if (frontBumper.isPressed()) {
-		drive->moveDistance(30_ft); // has goal, continue to drive back
-	}
-	else { // go for middle goal then go for alliance goal
-		frontClamp.set_value(false);
-		drive->moveDistance(-2_ft);
-		drive->driveToPoint({3.8_ft, -3_ft});
+		frontClamp.set_value(true); // clamp the goal
 		pros::delay(200);
-		frontClamp.set_value(true);
-		pros::delay(200);
-		drive->turnToAngle(-90_deg);
-		drive->moveDistance(-5_ft);
-		drive->turnToAngle(0_deg);
-		drive->moveDistance(-5_ft);
-	}
-
-}
-
-/*
-void right() {
-	drive->driveToPoint({3.6_ft, 0_ft}); // goal around half a foot
-	pros::delay(200);
-	frontClamp.set_value(true);
-	pros::delay(200);
-	drive->driveToPoint({2_ft, 0_ft}); // drive back
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({-1_ft, 0_ft}); // has goal, continue to drive back
+		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // go for middle goal
-		frontClamp.set_value(false);
-		drive->driveToPoint({3.8_ft, -3_ft});
-		pros::delay(200);
-		frontClamp.set_value(true);
-		pros::delay(200);
-		drive->driveToPoint({-1_ft, 0_ft});
+		drive->driveToPoint({3.7_ft, 3.3_ft}); // drive towards goal
+		if (frontBumper.isPressed()) { // conserve air
+			pros::delay(200);
+			frontClamp.set_value(true); // clamp the goal
+			pros::delay(200);
+		}
+		drive->driveToPoint({1_ft, 3.5_ft}, true); // good position
 	}
-
 }
-*/
+
+void right() {
+	drive->driveToPoint({3.7_ft, 0_ft}); // goal around half a foot
+	if (frontBumper.isPressed()) {
+		frontClamp.set_value(true); // clamp the goal
+		pros::delay(200);
+		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
+	}
+	else { // go for middle goal
+		drive->driveToPoint({1.4_ft, 0_ft}, true);
+		drive->turnToAngle(-80_deg); // face the alliance goal
+		drive->moveDistance(-2.2_ft); //drive into alliance goal
+		backClamp.set_value(false); // clamp down
+		pros::delay(200);
+		tilt.set_value(false);
+		drive->driveToPoint({2.2_ft, -2.2_ft});
+		drive->turnToAngle(-90_deg); // positioned at rings
+		intake.moveVelocity(100); // intake rings
+		drive->driveToPoint({2.2_ft, -6_ft});
+		drive->driveToPoint({2.2_ft, -3_ft}, true);
+		drive->turnToAngle(0_deg); // face forward
+	}
+}
 
 void right_middle() {
-
+	drive->driveToPoint({3.7_ft, 0_ft}); // goal around half a foot
+	if (frontBumper.isPressed()) {
+		frontClamp.set_value(true); // clamp the goal
+		pros::delay(200);
+		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
+	}
+	else { // go for middle goal
+		drive->driveToPoint({2.9_ft, 0_ft}, true);
+		drive->driveToPoint({3.8_ft, -3_ft}); // drive towards goal
+		pros::delay(200);
+		frontClamp.set_value(true); // clamp the goal
+		pros::delay(200);
+		drive->driveToPoint({1.4_ft, 0_ft}, true);
+		drive->turnToAngle(-80_deg); // face the alliance goal
+		drive->moveDistance(-2.2_ft); //drive into alliance goal
+		backClamp.set_value(false); // clamp down
+		pros::delay(200);
+		tilt.set_value(false);
+		drive->driveToPoint({2.2_ft, -2.2_ft});
+		drive->turnToAngle(-90_deg); // positioned at rings
+		intake.moveVelocity(100); // intake rings
+		drive->driveToPoint({2.2_ft, -6_ft});
+		drive->driveToPoint({2.2_ft, -3_ft}, true);
+		drive->turnToAngle(0_deg); // face forward
+	}
 }
 
 void middle_left() {
