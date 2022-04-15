@@ -214,7 +214,7 @@ void right() {
 		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // go for middle goal
-		drive->driveToPoint({1.4_ft, 0_ft}, true);
+		drive->driveToPoint({1.6_ft, 0_ft}, true);
 		drive->turnToAngle(-80_deg); // face the alliance goal
 		drive->moveDistance(-2.2_ft); //drive into alliance goal
 		backClamp.set_value(false); // clamp down
@@ -258,19 +258,69 @@ void right_middle() {
 }
 
 void middle_left() {
-
+	drive->driveToPoint({4_ft, 3.8_ft}); // goal around half a foot
+	if (frontBumper.isPressed()) {
+		frontClamp.set_value(true); // clamp the goal
+		pros::delay(200);
+		drive->driveToPoint({0_ft, 0_ft}, true); // has goal, continue to drive back
+	}
+	else { // good position
+		drive->driveToPoint({2.2_ft, -6_ft});
+		drive->driveToPoint({2.2_ft, -3_ft}, true);
+		drive->turnToAngle(0_deg); // face forward
+	}
 }
 
 void middle_right() {
-
+	drive->driveToPoint({4_ft, -2.4_ft}); // goal around half a foot
+	if (frontBumper.isPressed()) {
+		frontClamp.set_value(true); // clamp the goal
+		pros::delay(200);
+		drive->driveToPoint({0_ft, 0_ft}, true); // has goal, continue to drive back
+	}
+	else { // good position
+		drive->driveToPoint({2.2_ft, -3_ft}, true);
+		drive->turnToAngle(0_deg); // face forward
+	}
 }
 
 void wings_left() {
-
+	drive->driveToPoint({2.7_ft, 0.7_ft}); // goal around half a foot
+	drive->turnToAngle(40_deg); // swat goal
+	drive->moveDistance(1.8_ft); // move forward towards goal
+	if (frontBumper.isPressed()) {
+		frontClamp.set_value(true); // clamp the goal
+		pros::delay(200);
+		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
+	}
+	else { // go for middle goal
+		drive->driveToPoint({1_ft, 3.5_ft}, true); // good position
+	}
 }
 
 void wings_right() {
-
+	drive->driveToPoint({2.7_ft, 0_ft}); // goal around half a foot
+	drive->turnToAngle(40_deg); // swat goal
+	drive->moveDistance(1.8_ft); // move forward towards goal
+	if (frontBumper.isPressed()) {
+		frontClamp.set_value(true); // clamp the goal
+		pros::delay(200);
+		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
+	}
+	else { // go for alliance goal
+		drive->driveToPoint({1.6_ft, 0_ft}, true);
+		drive->turnToAngle(-80_deg); // face the alliance goal
+		drive->moveDistance(-2.2_ft); //drive into alliance goal
+		backClamp.set_value(false); // clamp down
+		pros::delay(200);
+		tilt.set_value(false); // tilt
+		drive->driveToPoint({2.2_ft, -2.2_ft});
+		drive->turnToAngle(-90_deg); // positioned at rings
+		intake.moveVelocity(100); // intake rings
+		drive->driveToPoint({2.2_ft, -6_ft});
+		drive->driveToPoint({2.2_ft, -3_ft}, true);
+		drive->turnToAngle(0_deg); // face forward
+	}
 }
 
 void autonomous() {
