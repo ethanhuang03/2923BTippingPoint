@@ -168,8 +168,22 @@ void left_middle() {
 
 void right() {
 	drive->driveToPoint({3.6_ft, 0_ft}); // goal around half a foot
-	pros::delay(10);
-	drive->driveToPoint({-1_ft, 0_ft}); // drive back
+	pros::delay(200);
+	frontClamp.set_value(true);
+	pros::delay(200);
+	drive->driveToPoint({2_ft, 0_ft}); // drive back
+	if (frontBumper.isPressed()) {
+		drive->driveToPoint({-1_ft, 0_ft}); // has goal, continue to drive back
+	}
+	else { // go for middle goal
+		frontClamp.set_value(false);
+		drive->driveToPoint({3.8_ft, -3_ft});
+		pros::delay(200);
+		frontClamp.set_value(true);
+		pros::delay(200);
+		drive->driveToPoint({-1_ft, 0_ft});
+	}
+
 }
 
 void right_middle() {
@@ -193,6 +207,7 @@ void wings_right() {
 }
 
 void autonomous() {
+	drive->setState({0_in, 0_in, 0_deg});
 	if(selector::auton == 1) { // Red Left
 		left();
 	}
