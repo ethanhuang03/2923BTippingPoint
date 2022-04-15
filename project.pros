@@ -316,6 +316,27 @@
                 "target": "v5",
                 "user_files": [],
                 "version": "4.2.0"
+            },
+            "pros-grafana-lib": {
+                "location": "C:\\Users\\Ethan\\AppData\\Roaming\\PROS\\templates\\pros-grafana-lib@1.0.0",
+                "metadata": {
+                    "origin": "local"
+                },
+                "name": "pros-grafana-lib",
+                "py/object": "pros.conductor.templates.local_template.LocalTemplate",
+                "supported_kernels": "^3.5.4",
+                "system_files": [
+                    "include\\pros-grafana-lib\\variables\\variable.h",
+                    "include\\pros-grafana-lib\\variables\\variabledatahandler.h",
+                    "include\\pros-grafana-lib\\lib\\json.hpp",
+                    "include\\pros-grafana-lib\\api.h",
+                    "include\\pros-grafana-lib\\guimanager.h",
+                    "firmware\\pros-grafana-lib.a",
+                    "include\\pros-grafana-lib\\variables\\variablegroup.h"
+                ],
+                "target": "v5",
+                "user_files": [],
+                "version": "1.0.0"
             }
         },
         "upload_options": {}
