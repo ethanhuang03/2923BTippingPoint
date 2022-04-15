@@ -5,7 +5,7 @@
 Controller master(ControllerId::master);
 Controller partner(ControllerId::partner);
 
-std::shared_ptr<ChassisController> drive;
+std::shared_ptr<OdomChassisController> drive;
 std::shared_ptr<AsyncMotionProfileController> driveController;
 
 Motor backRightDrive(1);
@@ -25,8 +25,8 @@ RotationSensor rightRotationSensor(10, true);
 RotationSensor centerRotationSensor(11);
 //IMU interialSensor(11);
 
-ADIButton bumper0('A');
-ADIButton bumper1('B');
+ADIButton frontBumper('A');
+ADIButton backBumper('B');
 
 pros::ADIDigitalOut frontClamp('C');
 pros::ADIDigitalOut backClamp('D');
@@ -97,8 +97,8 @@ void initialize() {
 	grafanalib::Variable<RotationSensor> rightRotationSensorVar("rightRotationSensor", rightRotationSensor);
 	grafanalib::Variable<RotationSensor> centerRotationSensorVar("centerRotationSensor", centerRotationSensor);
 
-	grafanalib::Variable<ADIButton> bumper0Var("bumper0", bumper0);
-	grafanalib::Variable<ADIButton> bumper1Var("bumper1", bumper1);
+	grafanalib::Variable<ADIButton> frontBumperVar("frontBumper", frontBumper);
+	grafanalib::Variable<ADIButton> backBumperVar("backBumper", backBumper);
 
 	RightDriveVar.add_getter("Temperature", &MotorGroup::getTemperature);
 	RightDriveVar.add_getter("Actual Velocity", &MotorGroup::getActualVelocity);
@@ -128,8 +128,8 @@ void initialize() {
 	rightRotationSensorVar.add_getter("Rotation", &RotationSensor::get);
 	centerRotationSensorVar.add_getter("Rotation", &RotationSensor::get);
 
-	bumper0Var.add_getter("Pressed", &ADIButton::isPressed);
-	bumper1Var.add_getter("Pressed", &ADIButton::isPressed);
+	frontBumperVar.add_getter("Pressed", &ADIButton::isPressed);
+	backBumperVar.add_getter("Pressed", &ADIButton::isPressed);
 
 	manager->registerDataHandler(&RightDriveVar);
 	manager->registerDataHandler(&LeftDriveVar);
@@ -138,8 +138,8 @@ void initialize() {
 	manager->registerDataHandler(&leftRotationSensorVar);
 	manager->registerDataHandler(&rightRotationSensorVar);
 	manager->registerDataHandler(&centerRotationSensorVar);
-	manager->registerDataHandler(&bumper0Var);
-	manager->registerDataHandler(&bumper1Var);
+	manager->registerDataHandler(&frontBumperVar);
+	manager->registerDataHandler(&backBumperVar);
 
 	manager->startTask();
 
@@ -167,7 +167,9 @@ void left_middle() {
 }
 
 void right() {
-
+	drive->driveToPoint({3.6_ft, 0_ft}); // goal around half a foot
+	pros::delay(10);
+	drive->driveToPoint({-1_ft, 0_ft}); // drive back
 }
 
 void right_middle() {
