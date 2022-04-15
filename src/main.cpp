@@ -171,6 +171,30 @@ void right() {
 	pros::delay(200);
 	frontClamp.set_value(true);
 	pros::delay(200);
+	if (frontBumper.isPressed()) {
+		drive->moveDistance(30_ft); // has goal, continue to drive back
+	}
+	else { // go for middle goal then go for alliance goal
+		frontClamp.set_value(false);
+		drive->moveDistance(-2_ft);
+		drive->driveToPoint({3.8_ft, -3_ft});
+		pros::delay(200);
+		frontClamp.set_value(true);
+		pros::delay(200);
+		drive->turnToAngle(-90_deg);
+		drive->moveDistance(-5_ft);
+		drive->turnToAngle(0_deg);
+		drive->moveDistance(-5_ft);
+	}
+
+}
+
+/*
+void right() {
+	drive->driveToPoint({3.6_ft, 0_ft}); // goal around half a foot
+	pros::delay(200);
+	frontClamp.set_value(true);
+	pros::delay(200);
 	drive->driveToPoint({2_ft, 0_ft}); // drive back
 	if (frontBumper.isPressed()) {
 		drive->driveToPoint({-1_ft, 0_ft}); // has goal, continue to drive back
@@ -185,6 +209,7 @@ void right() {
 	}
 
 }
+*/
 
 void right_middle() {
 
