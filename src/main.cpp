@@ -1,5 +1,6 @@
 #include "main.h"
 #include "autoSelect/selection.h"
+#include "pros-grafana-lib/api.h"
 
 Controller master(ControllerId::master);
 Controller partner(ControllerId::partner);
@@ -33,6 +34,7 @@ pros::ADIDigitalOut tilt('E');
 pros::ADIDigitalOut flap('F');
 pros::ADIDigitalOut wings('G');
 
+auto manager = std::make_shared<grafanalib::GUIManager>();
 
 void initialize() {
 	pros::lcd::initialize();
@@ -82,6 +84,65 @@ void initialize() {
 		*/
 		.withOutput(drive)
 		.buildMotionProfileController();
+
+	manager->setRefreshRate(101); // > 100 if wireless
+
+	grafanalib::Variable<MotorGroup> RightDriveVar("RightDrive", RightDrive);
+	grafanalib::Variable<MotorGroup> LeftDriveVar("LeftDrive", LeftDrive);
+
+	grafanalib::Variable<Motor> intakeVar("intake", intake);
+	grafanalib::Variable<Motor> liftVar("lift", lift);
+
+	grafanalib::Variable<RotationSensor> leftRotationSensorVar("leftRotationSensor", leftRotationSensor);
+	grafanalib::Variable<RotationSensor> rightRotationSensorVar("rightRotationSensor", rightRotationSensor);
+	grafanalib::Variable<RotationSensor> centerRotationSensorVar("centerRotationSensor", centerRotationSensor);
+
+	grafanalib::Variable<ADIButton> bumper0Var("bumper0", bumper0);
+	grafanalib::Variable<ADIButton> bumper1Var("bumper1", bumper1);
+
+	RightDriveVar.add_getter("Temperature", &MotorGroup::getTemperature);
+	RightDriveVar.add_getter("Actual Velocity", &MotorGroup::getActualVelocity);
+	RightDriveVar.add_getter("Target Velocity", &MotorGroup::getTargetVelocity);
+	RightDriveVar.add_getter("Voltage", &MotorGroup::getVoltage);
+	RightDriveVar.add_getter("Efficiency", &MotorGroup::getEfficiency);
+
+	LeftDriveVar.add_getter("Temperature", &MotorGroup::getTemperature);
+	LeftDriveVar.add_getter("Actual Velocity", &MotorGroup::getActualVelocity);
+	LeftDriveVar.add_getter("Target Velocity", &MotorGroup::getTargetVelocity);
+	LeftDriveVar.add_getter("Voltage", &MotorGroup::getVoltage);
+	LeftDriveVar.add_getter("Efficiency", &MotorGroup::getEfficiency);
+
+	intakeVar.add_getter("Temperature", &Motor::getTemperature);
+	intakeVar.add_getter("Actual Velocity", &Motor::getActualVelocity);
+	intakeVar.add_getter("Target Velocity", &Motor::getTargetVelocity);
+	intakeVar.add_getter("Voltage", &Motor::getVoltage);
+	intakeVar.add_getter("Efficiency", &Motor::getEfficiency);
+
+	liftVar.add_getter("Temperature", &Motor::getTemperature);
+	liftVar.add_getter("Actual Velocity", &Motor::getActualVelocity);
+	liftVar.add_getter("Target Velocity", &Motor::getTargetVelocity);
+	liftVar.add_getter("Voltage", &Motor::getVoltage);
+	liftVar.add_getter("Efficiency", &Motor::getEfficiency);
+
+	leftRotationSensorVar.add_getter("Rotation", &RotationSensor::get);
+	rightRotationSensorVar.add_getter("Rotation", &RotationSensor::get);
+	centerRotationSensorVar.add_getter("Rotation", &RotationSensor::get);
+
+	bumper0Var.add_getter("Pressed", &ADIButton::isPressed);
+	bumper1Var.add_getter("Pressed", &ADIButton::isPressed);
+
+	manager->registerDataHandler(&RightDriveVar);
+	manager->registerDataHandler(&LeftDriveVar);
+	manager->registerDataHandler(&intakeVar);
+	manager->registerDataHandler(&liftVar);
+	manager->registerDataHandler(&leftRotationSensorVar);
+	manager->registerDataHandler(&rightRotationSensorVar);
+	manager->registerDataHandler(&centerRotationSensorVar);
+	manager->registerDataHandler(&bumper0Var);
+	manager->registerDataHandler(&bumper1Var);
+
+	manager->startTask();
+
 }
 
 void disabled() {}
