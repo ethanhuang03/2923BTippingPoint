@@ -105,24 +105,44 @@ void initialize() {
 	RightDriveVar.add_getter("Target Velocity", &MotorGroup::getTargetVelocity);
 	RightDriveVar.add_getter("Voltage", &MotorGroup::getVoltage);
 	RightDriveVar.add_getter("Efficiency", &MotorGroup::getEfficiency);
+	RightDriveVar.add_getter("Current", &MotorGroup::getCurrentDraw);
+	RightDriveVar.add_getter("Power", &MotorGroup::getPower);
+	RightDriveVar.add_getter("Torque", &MotorGroup::getTorque);
+	RightDriveVar.add_getter("Position", &MotorGroup::getPosition);
+	RightDriveVar.add_getter("Target Position", &MotorGroup::getTargetPosition);
 
 	LeftDriveVar.add_getter("Temperature", &MotorGroup::getTemperature);
 	LeftDriveVar.add_getter("Actual Velocity", &MotorGroup::getActualVelocity);
 	LeftDriveVar.add_getter("Target Velocity", &MotorGroup::getTargetVelocity);
 	LeftDriveVar.add_getter("Voltage", &MotorGroup::getVoltage);
 	LeftDriveVar.add_getter("Efficiency", &MotorGroup::getEfficiency);
+	LeftDriveVar.add_getter("Current", &MotorGroup::getCurrentDraw);
+	LeftDriveVar.add_getter("Power", &MotorGroup::getPower);
+	LeftDriveVar.add_getter("Torque", &MotorGroup::getTorque);
+	LeftDriveVar.add_getter("Position", &MotorGroup::getPosition);
+	LeftDriveVar.add_getter("Target Position", &MotorGroup::getTargetPosition);
 
 	intakeVar.add_getter("Temperature", &Motor::getTemperature);
 	intakeVar.add_getter("Actual Velocity", &Motor::getActualVelocity);
 	intakeVar.add_getter("Target Velocity", &Motor::getTargetVelocity);
 	intakeVar.add_getter("Voltage", &Motor::getVoltage);
 	intakeVar.add_getter("Efficiency", &Motor::getEfficiency);
+	intakeVar.add_getter("Current", &Motor::getCurrentDraw);
+	intakeVar.add_getter("Power", &Motor::getPower);
+	intakeVar.add_getter("Torque", &Motor::getTorque);
+	intakeVar.add_getter("Position", &Motor::getPosition);
+	intakeVar.add_getter("Target Position", &Motor::getTargetPosition);
 
 	liftVar.add_getter("Temperature", &Motor::getTemperature);
 	liftVar.add_getter("Actual Velocity", &Motor::getActualVelocity);
 	liftVar.add_getter("Target Velocity", &Motor::getTargetVelocity);
 	liftVar.add_getter("Voltage", &Motor::getVoltage);
 	liftVar.add_getter("Efficiency", &Motor::getEfficiency);
+	liftVar.add_getter("Current", &Motor::getCurrentDraw);
+	liftVar.add_getter("Power", &Motor::getPower);
+	liftVar.add_getter("Torque", &Motor::getTorque);
+	liftVar.add_getter("Position", &Motor::getPosition);
+	liftVar.add_getter("Target Position", &Motor::getTargetPosition);
 
 	leftRotationSensorVar.add_getter("Rotation", &RotationSensor::get);
 	rightRotationSensorVar.add_getter("Rotation", &RotationSensor::get);
