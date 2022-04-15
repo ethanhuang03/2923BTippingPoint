@@ -5,7 +5,7 @@
 Controller master(ControllerId::master);
 Controller partner(ControllerId::partner);
 
-std::shared_ptr<ChassisController> drive;
+std::shared_ptr<OdomChassisController> drive;
 std::shared_ptr<AsyncMotionProfileController> driveController;
 
 Motor backRightDrive(1);
@@ -25,8 +25,8 @@ RotationSensor rightRotationSensor(10, true);
 RotationSensor centerRotationSensor(11);
 //IMU interialSensor(11);
 
-ADIButton bumper0('A');
-ADIButton bumper1('B');
+ADIButton frontBumper('A');
+ADIButton backBumper('B');
 
 pros::ADIDigitalOut frontClamp('C');
 pros::ADIDigitalOut backClamp('D');
@@ -191,6 +191,7 @@ void wings_right() {
 }
 
 void autonomous() {
+	drive->setState({0_in, 0_in, 0_deg});
 	if(selector::auton == 1) { // Red Left
 		left();
 	}
