@@ -186,9 +186,9 @@ void skills() {
 
 void left() {
 	drive->driveToPoint({3.7_ft, 0.7_ft}); // goal around half a foot
+	frontClamp.set_value(true); // clamp the goal
+	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		frontClamp.set_value(true); // clamp the goal
-		pros::delay(200);
 		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	drive->driveToPoint({1_ft, 3.5_ft}, true); // good position
@@ -196,9 +196,9 @@ void left() {
 
 void left_middle() {
 	drive->driveToPoint({3.7_ft, 0.7_ft}); // goal around half a foot
+	frontClamp.set_value(true); // clamp the goal
+	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		frontClamp.set_value(true); // clamp the goal
-		pros::delay(200);
 		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // go for middle goal
@@ -214,9 +214,9 @@ void left_middle() {
 
 void right() {
 	drive->driveToPoint({3.7_ft, 0_ft}); // goal around half a foot
+	frontClamp.set_value(true); // clamp the goal
+	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		frontClamp.set_value(true); // clamp the goal
-		pros::delay(200);
 		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // go for middle goal
@@ -227,7 +227,7 @@ void right() {
 		pros::delay(200);
 		tilt.set_value(false);
 		drive->driveToPoint({2.2_ft, -2.2_ft});
-    asyncLift->setTarget(50_deg); // raise the lift
+    asyncLift->setTarget(50); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
@@ -238,9 +238,9 @@ void right() {
 
 void right_middle() {
 	drive->driveToPoint({3.7_ft, 0_ft}); // goal around half a foot
+	frontClamp.set_value(true); // clamp the goal
+	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		frontClamp.set_value(true); // clamp the goal
-		pros::delay(200);
 		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // go for middle goal
@@ -256,7 +256,7 @@ void right_middle() {
 		pros::delay(200);
 		tilt.set_value(false);
 		drive->driveToPoint({2.2_ft, -2.2_ft});
-    asyncLift->setTarget(50_deg); // raise the lift
+    asyncLift->setTarget(50); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
@@ -267,9 +267,9 @@ void right_middle() {
 
 void middle_left() {
 	drive->driveToPoint({4_ft, 3.8_ft}); // goal around half a foot
+	frontClamp.set_value(true); // clamp the goal
+	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		frontClamp.set_value(true); // clamp the goal
-		pros::delay(200);
 		drive->driveToPoint({0_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // good position
@@ -281,9 +281,9 @@ void middle_left() {
 
 void middle_right() {
 	drive->driveToPoint({4_ft, -2.4_ft}); // goal around half a foot
+	frontClamp.set_value(true); // clamp the goal
+	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		frontClamp.set_value(true); // clamp the goal
-		pros::delay(200);
 		drive->driveToPoint({0_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // good position
@@ -296,9 +296,9 @@ void wings_left() {
 	drive->driveToPoint({2.7_ft, 0.7_ft}); // goal around half a foot
 	drive->turnToAngle(40_deg); // swat goal
 	drive->moveDistance(1.8_ft); // move forward towards goal
+	frontClamp.set_value(true); // clamp the goal
+	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		frontClamp.set_value(true); // clamp the goal
-		pros::delay(200);
 		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // go for middle goal
@@ -310,9 +310,9 @@ void wings_right() {
 	drive->driveToPoint({2.7_ft, 0_ft}); // goal around half a foot
 	drive->turnToAngle(40_deg); // swat goal
 	drive->moveDistance(1.8_ft); // move forward towards goal
+	frontClamp.set_value(true); // clamp the goal
+	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		frontClamp.set_value(true); // clamp the goal
-		pros::delay(200);
 		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // go for alliance goal
@@ -323,7 +323,7 @@ void wings_right() {
 		pros::delay(200);
 		tilt.set_value(false); // tilt
 		drive->driveToPoint({2.2_ft, -2.2_ft});
-    asyncLift->setTarget(50_deg); // raise the lift
+    asyncLift->setTarget(50); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
