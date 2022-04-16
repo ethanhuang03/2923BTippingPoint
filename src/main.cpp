@@ -1,41 +1,40 @@
 #include "main.h"
 #include "autoSelect/selection.h"
-#include "pros-grafana-lib/api.h"
+//#include "pros-grafana-lib/api.h"
 
 Controller master(ControllerId::master);
 Controller partner(ControllerId::partner);
 
 std::shared_ptr<OdomChassisController> drive;
-std::shared_ptr<AsyncMotionProfileController> driveController;
-std::shared_ptr<AsyncPositionController<double, double>> asyncLift;
+//std::shared_ptr<AsyncPositionController<double, double>> asyncLift;
 
-Motor backRightDrive(1);
-Motor frontRightDrive(2);
-Motor topRightDrive(3);
-Motor backLeftDrive(-4);
-Motor frontLeftDrive(-5);
-Motor topLeftDrive(-6);
+Motor backRightDrive(4);
+Motor frontRightDrive(5);
+Motor topRightDrive(6);
+Motor backLeftDrive(-1);
+Motor frontLeftDrive(-2);
+Motor topLeftDrive(-3);
 Motor intake(7);
 Motor lift(8);
 
 MotorGroup RightDrive({frontRightDrive, backRightDrive, topRightDrive});
 MotorGroup LeftDrive({frontLeftDrive, backLeftDrive, topLeftDrive});
 
-RotationSensor leftRotationSensor(9);
-RotationSensor rightRotationSensor(10, true);
+RotationSensor leftRotationSensor(13);
+RotationSensor rightRotationSensor(12, true);
 RotationSensor centerRotationSensor(11);
 //IMU interialSensor(11);
 
-ADIButton frontBumper('A');
-ADIButton backBumper('B');
+ADIButton frontBumper('E');
+ADIButton backBumper('D');
 
 pros::ADIDigitalOut frontClamp('C');
-pros::ADIDigitalOut backClamp('D');
-pros::ADIDigitalOut tilt('E');
+pros::ADIDigitalOut backClamp('A');
+pros::ADIDigitalOut tilt('B');
 pros::ADIDigitalOut flap('F');
 pros::ADIDigitalOut wings('G');
 
-auto manager = std::make_shared<grafanalib::GUIManager>();
+//auto manager = std::make_shared<grafanalib::GUIManager>();
 
 void initialize() {
 	pros::lcd::initialize();
@@ -51,20 +50,21 @@ void initialize() {
 		)
 		.withMotors(LeftDrive, RightDrive)
 		//Green gearset, 4 in wheel diam, 11.5 in wheel track
-		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 13.7795_in}, imev5BlueTPR})
+		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 14.8333_in}, imev5BlueTPR})
 		.withSensors(
 			leftRotationSensor,
-			rightRotationSensor
-			// centerRotationSensor
+			rightRotationSensor,
+			centerRotationSensor
 		)
 		// specify the tracking wheels diameter (2.75 in), track (7 in), and TPR (360)
 		// specify the middle encoder distance (1 in) and diameter (2.75 in)
-    	.withOdometry({{2.75_in, 7_in, 1_in, 2.75_in}, quadEncoderTPR})
+    	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR})
 		.withGains(
 			{0.002, 0, 0.000197}, // Distance controller gains
 			{0.00295, 0, 0.000090}, // Turn controller gains 0.00295
 			{0.002, 0, 0.0001}  // Angle controller gains (helps drive straight)
 		)
+		/*
 		// Stuff Below Here is Experimental
 		.withDerivativeFilters(
 			std::make_unique<AverageFilter<3>>(), // Distance controller filter
@@ -72,25 +72,15 @@ void initialize() {
 			std::make_unique<AverageFilter<3>>()  // Angle controller filter
 		)
 		.withClosedLoopControllerTimeUtil(50, 5, 250_ms) // The minimum error to be considered settled, error derivative to be considered settled, time within atTargetError to be considered settled
+		*/
 		.buildOdometry();
 
-	std::shared_ptr<AsyncMotionProfileController> driveController =
-		AsyncMotionProfileControllerBuilder()
-		/*
-		.withLimits({
-			1.0, // Maximum linear velocity of the Chassis in m/s
-			2.0, // Maximum linear acceleration of the Chassis in m/s/s
-			10.0 // Maximum linear jerk of the Chassis in m/s/s/s
-		})
-		*/
-		.withOutput(drive)
-		.buildMotionProfileController();
-
+	/*
 	asyncLift = AsyncPosControllerBuilder()
-    .withMotor(8) // lift motor port 8
-    .withGains({0.001, 0.0001, 0.0001})
-    .build();
-
+    	.withMotor(8) // lift motor port 8
+    	.build();
+	*/
+	/*
 	manager->setRefreshRate(101); // > 100 if wireless
 
 	grafanalib::Variable<MotorGroup> RightDriveVar("RightDrive", RightDrive);
@@ -168,6 +158,7 @@ void initialize() {
 	manager->registerDataHandler(&backBumperVar);
 
 	manager->startTask();
+	*/
 
 }
 
@@ -227,7 +218,7 @@ void right() {
 		pros::delay(200);
 		tilt.set_value(false);
 		drive->driveToPoint({2.2_ft, -2.2_ft});
-    asyncLift->setTarget(50); // raise the lift
+    	//asyncLift->setTarget(50); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
@@ -256,7 +247,7 @@ void right_middle() {
 		pros::delay(200);
 		tilt.set_value(false);
 		drive->driveToPoint({2.2_ft, -2.2_ft});
-    asyncLift->setTarget(50); // raise the lift
+    	//asyncLift->setTarget(50); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
@@ -323,7 +314,7 @@ void wings_right() {
 		pros::delay(200);
 		tilt.set_value(false); // tilt
 		drive->driveToPoint({2.2_ft, -2.2_ft});
-    asyncLift->setTarget(50); // raise the lift
+    	//asyncLift->setTarget(50); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
