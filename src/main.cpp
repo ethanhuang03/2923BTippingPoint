@@ -7,6 +7,7 @@ Controller partner(ControllerId::partner);
 
 std::shared_ptr<OdomChassisController> drive;
 std::shared_ptr<AsyncMotionProfileController> driveController;
+std::shared_ptr<AsyncPositionController<double, double>> asyncLift;
 
 Motor backRightDrive(1);
 Motor frontRightDrive(2);
@@ -84,6 +85,11 @@ void initialize() {
 		*/
 		.withOutput(drive)
 		.buildMotionProfileController();
+
+	asyncLift = AsyncPosControllerBuilder()
+    .withMotor(8) // lift motor port 8
+    .withGains({0.001, 0.0001, 0.0001})
+    .build();
 
 	manager->setRefreshRate(101); // > 100 if wireless
 
@@ -216,11 +222,12 @@ void right() {
 	else { // go for middle goal
 		drive->driveToPoint({1.6_ft, 0_ft}, true);
 		drive->turnToAngle(-80_deg); // face the alliance goal
-		drive->moveDistance(-2.2_ft); //drive into alliance goal
+		drive->moveDistance(-2.2_ft); // drive into alliance goal
 		backClamp.set_value(false); // clamp down
 		pros::delay(200);
 		tilt.set_value(false);
 		drive->driveToPoint({2.2_ft, -2.2_ft});
+    asyncLift->setTarget(50_deg); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
@@ -249,6 +256,7 @@ void right_middle() {
 		pros::delay(200);
 		tilt.set_value(false);
 		drive->driveToPoint({2.2_ft, -2.2_ft});
+    asyncLift->setTarget(50_deg); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
@@ -315,6 +323,7 @@ void wings_right() {
 		pros::delay(200);
 		tilt.set_value(false); // tilt
 		drive->driveToPoint({2.2_ft, -2.2_ft});
+    asyncLift->setTarget(50_deg); // raise the lift
 		drive->turnToAngle(-90_deg); // positioned at rings
 		intake.moveVelocity(100); // intake rings
 		drive->driveToPoint({2.2_ft, -6_ft});
