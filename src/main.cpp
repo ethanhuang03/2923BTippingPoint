@@ -49,15 +49,15 @@ void initialize() {
 		)
 		.withMotors(LeftDrive, RightDrive)
 		//Green gearset, 4 in wheel diam, 11.5 in wheel track
-		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 13.7795_in}, imev5BlueTPR})
+		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 14.8333_in}, imev5BlueTPR})
 		.withSensors(
 			leftRotationSensor,
-			rightRotationSensor
-			// centerRotationSensor
+			rightRotationSensor,
+			centerRotationSensor
 		)
 		// specify the tracking wheels diameter (2.75 in), track (7 in), and TPR (360)
 		// specify the middle encoder distance (1 in) and diameter (2.75 in)
-    	.withOdometry({{2.75_in, 7_in, 1_in, 2.75_in}, quadEncoderTPR})
+    	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR})
 		.withGains(
 			{0.002, 0, 0.000197}, // Distance controller gains
 			{0.00295, 0, 0.000090}, // Turn controller gains 0.00295
@@ -71,15 +71,13 @@ void initialize() {
 		)
 		.withClosedLoopControllerTimeUtil(50, 5, 250_ms) // The minimum error to be considered settled, error derivative to be considered settled, time within atTargetError to be considered settled
 		.buildOdometry();
-	std::shared_ptr<AsyncMotionProfileController> driveController =
-		AsyncMotionProfileControllerBuilder()
-		/*
+
+	std::shared_ptr<AsyncMotionProfileController> driveController = AsyncMotionProfileControllerBuilder()
 		.withLimits({
 			1.0, // Maximum linear velocity of the Chassis in m/s
 			2.0, // Maximum linear acceleration of the Chassis in m/s/s
 			10.0 // Maximum linear jerk of the Chassis in m/s/s/s
 		})
-		*/
 		.withOutput(drive)
 		.buildMotionProfileController();
 
@@ -321,6 +319,7 @@ void opcontrol() {
 	pros::lcd::set_text(2, "User Control");
 	while(true){
 		tank_drive(master);
+
 		// Front Goal related stuff on the right hand
 		// lift
 		if(master.getDigital(ControllerDigital::R1) || partner.getDigital(ControllerDigital::R1)) {
@@ -339,6 +338,7 @@ void opcontrol() {
 		else if(master.getDigital(ControllerDigital::B) || partner.getDigital(ControllerDigital::B)) {
 			frontClamp.set_value(false);
 		}
+
 		// MOGO stuff
 		// intake
 		if(master.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
@@ -363,6 +363,7 @@ void opcontrol() {
 			pros::delay(500);
 			backClamp.set_value(false);
 		}
+
 		// the uncreachable buttons
 		// clamp killer / top ring scorer
 		if(master.getDigital(ControllerDigital::up) || partner.getDigital(ControllerDigital::up)) {
@@ -371,6 +372,7 @@ void opcontrol() {
 		else if(master.getDigital(ControllerDigital::left) || partner.getDigital(ControllerDigital::left)) {
 			flap.set_value(false);
 		}
+
 		// some safety features?
 		if(master.getDigital(ControllerDigital::X) || partner.getDigital(ControllerDigital::X)) {
 		}
@@ -378,6 +380,7 @@ void opcontrol() {
 		}
 		else {
 		}
+		
 		pros::delay(10);
 	}
 }
