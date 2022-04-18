@@ -8,29 +8,29 @@ std::shared_ptr<OdomChassisController> drive;
 std::shared_ptr<AsyncMotionProfileController> driveController;
 std::shared_ptr<AsyncPositionController<double, double>> asyncLift;
 
-Motor backRightDrive(1);
-Motor frontRightDrive(2);
-Motor topRightDrive(3);
-Motor backLeftDrive(-4);
-Motor frontLeftDrive(-5);
-Motor topLeftDrive(-6);
-Motor intake(7);
-Motor lift(8);
+Motor backRightDrive(4);
+Motor frontRightDrive(5);
+Motor topRightDrive(6);
+Motor backLeftDrive(-1);
+Motor frontLeftDrive(-2);
+Motor topLeftDrive(-3);
+Motor intake(8);
+Motor lift(7);
 
 MotorGroup RightDrive({frontRightDrive, backRightDrive, topRightDrive});
 MotorGroup LeftDrive({frontLeftDrive, backLeftDrive, topLeftDrive});
 
-RotationSensor leftRotationSensor(9);
-RotationSensor rightRotationSensor(10, true);
+RotationSensor leftRotationSensor(13);
+RotationSensor rightRotationSensor(12, true);
 RotationSensor centerRotationSensor(11);
 //IMU interialSensor(11);
 
-ADIButton frontBumper('A');
-ADIButton backBumper('B');
+ADIButton frontBumper('E');
+ADIButton backBumper('F');
 
 pros::ADIDigitalOut frontClamp('C');
-pros::ADIDigitalOut backClamp('D');
-pros::ADIDigitalOut tilt('E');
+pros::ADIDigitalOut backClamp('B');
+pros::ADIDigitalOut tilt('A');
 pros::ADIDigitalOut flap('F');
 pros::ADIDigitalOut wings('G');
 
@@ -48,15 +48,12 @@ void initialize() {
 			)
 		)
 		.withMotors(LeftDrive, RightDrive)
-		//Green gearset, 4 in wheel diam, 11.5 in wheel track
 		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 14.8333_in}, imev5BlueTPR})
 		.withSensors(
 			leftRotationSensor,
 			rightRotationSensor,
 			centerRotationSensor
 		)
-		// specify the tracking wheels diameter (2.75 in), track (7 in), and TPR (360)
-		// specify the middle encoder distance (1 in) and diameter (2.75 in)
     	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR})
 		.withGains(
 			{0.002, 0, 0.000197}, // Distance controller gains
@@ -72,7 +69,7 @@ void initialize() {
 		.withClosedLoopControllerTimeUtil(50, 5, 250_ms) // The minimum error to be considered settled, error derivative to be considered settled, time within atTargetError to be considered settled
 		.buildOdometry();
 
-	std::shared_ptr<AsyncMotionProfileController> driveController = AsyncMotionProfileControllerBuilder()
+	driveController = AsyncMotionProfileControllerBuilder()
 		.withLimits({
 			1.0, // Maximum linear velocity of the Chassis in m/s
 			2.0, // Maximum linear acceleration of the Chassis in m/s/s
