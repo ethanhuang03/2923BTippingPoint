@@ -96,6 +96,26 @@ void tank_drive(Controller controller) {
 }
 
 
+void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
+	if(intially_extended) {
+		if(extend) {
+			piston.set_value(false);
+		}
+		else {
+			piston.set_value(true);
+		}
+	}
+	else {
+		if(extend) {
+			piston.set_value(true);
+		}
+		else {
+			piston.set_value(false);
+		}
+	}
+}
+
+
 void skills() {}
 
 
