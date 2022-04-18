@@ -25,14 +25,14 @@ RotationSensor rightRotationSensor(12, true);
 RotationSensor centerRotationSensor(11);
 //IMU interialSensor(11);
 
-ADIButton frontBumper('E');
-ADIButton backBumper('F');
+ADIButton frontBumper('F');
+ADIButton backBumper('G');
 
-pros::ADIDigitalOut frontClamp('C');
-pros::ADIDigitalOut backClamp('B');
 pros::ADIDigitalOut tilt('A');
-pros::ADIDigitalOut flap('F');
-pros::ADIDigitalOut wings('G');
+pros::ADIDigitalOut backClamp('B');
+pros::ADIDigitalOut frontClamp('C');
+pros::ADIDigitalOut flap('D');
+pros::ADIDigitalOut wings('E');
 
 
 void initialize() {
@@ -91,7 +91,6 @@ void competition_initialize() {}
 
 
 void tank_drive(Controller controller) {
-	pros::lcd::set_text(1, "Tank Drive");
 	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
 }
 
@@ -113,6 +112,35 @@ void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
 			piston.set_value(false);
 		}
 	}
+}
+
+
+void front_clamp(bool clamped) {
+	piston(frontClamp, true, clamped);
+}
+
+
+void back_clamp(bool clamped) {
+	if (clamped) {
+		piston(backClamp, true, clamped);
+		pros::delay(500);
+		piston(tilt, true, clamped);
+	}
+	else {
+		piston(tilt, true, clamped);
+		pros::delay(500);
+		piston(backClamp, true, clamped);
+	}
+}
+
+
+void clamp_killer(bool down) {
+	piston(flap, false, down);
+}
+
+
+void swiper(bool down) {
+	piston(wings, false, down);
 }
 
 
