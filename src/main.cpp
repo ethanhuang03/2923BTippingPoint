@@ -14,8 +14,8 @@ Motor topRightDrive(6);
 Motor backLeftDrive(-1);
 Motor frontLeftDrive(-2);
 Motor topLeftDrive(-3);
-Motor intake(8);
-Motor lift(7);
+Motor intake(-8);
+Motor lift(-7);
 
 MotorGroup RightDrive({frontRightDrive, backRightDrive, topRightDrive});
 MotorGroup LeftDrive({frontLeftDrive, backLeftDrive, topLeftDrive});
@@ -80,7 +80,6 @@ void initialize() {
 
 	asyncLift = AsyncPosControllerBuilder()
     	.withMotor(8) // lift motor port 8
-    	.withGains({0.001, 0.0001, 0.0001})
     	.build();
 }
 
@@ -328,6 +327,7 @@ void opcontrol() {
 		else {
 			lift.moveVelocity(0);
 		}
+		
 		// clamp
 		if(master.getDigital(ControllerDigital::Y) || partner.getDigital(ControllerDigital::Y)) {
 			frontClamp.set_value(true);
@@ -335,18 +335,19 @@ void opcontrol() {
 		else if(master.getDigital(ControllerDigital::B) || partner.getDigital(ControllerDigital::B)) {
 			frontClamp.set_value(false);
 		}
-
+		
 		// MOGO stuff
 		// intake
 		if(master.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
-			intake.moveVelocity(100);
+			intake.moveVelocity(600);
 		}
 		else if(master.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
-			intake.moveVelocity(-100);
+			intake.moveVelocity(-600);
 		}
 		else {
 			intake.moveVelocity(0);
 		}
+		
 		// mogo grab and tilt
 		if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
 			// pull in and tilt
