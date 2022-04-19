@@ -28,17 +28,38 @@ RotationSensor centerRotationSensor(11);
 ADIButton frontBumper('F');
 ADIButton backBumper('G');
 
-pros::ADIDigitalOut tilt('A');
-pros::ADIDigitalOut backClamp('B');
+pros::ADIDigitalOut tilt('B');
+pros::ADIDigitalOut backClamp('A');
 pros::ADIDigitalOut frontClamp('C');
 pros::ADIDigitalOut flap('D');
 pros::ADIDigitalOut wings('E');
+
+
+void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
+	if(intially_extended) {
+		if(extend) {
+			piston.set_value(false);
+		}
+		else {
+			piston.set_value(true);
+		}
+	}
+	else {
+		if(extend) {
+			piston.set_value(true);
+		}
+		else {
+			piston.set_value(false);
+		}
+	}
+}
 
 
 void initialize() {
 	pros::lcd::initialize();
 	selector::init();
 	pros::lcd::set_text(0, "King's B | 2923B");
+	piston(backClamp, true, false);
 	drive = ChassisControllerBuilder()
 		.withLogger(
 			std::make_shared<Logger>(
@@ -92,55 +113,6 @@ void competition_initialize() {}
 
 void tank_drive(Controller controller) {
 	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
-}
-
-
-void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
-	if(intially_extended) {
-		if(extend) {
-			piston.set_value(false);
-		}
-		else {
-			piston.set_value(true);
-		}
-	}
-	else {
-		if(extend) {
-			piston.set_value(true);
-		}
-		else {
-			piston.set_value(false);
-		}
-	}
-}
-
-
-void front_clamp(bool clamped) {
-	piston(frontClamp, true, clamped);
-}
-
-
-void back_clamp(bool clamped) {
-	if (clamped) {
-		piston(backClamp, true, clamped);
-		pros::delay(500);
-		piston(tilt, true, clamped);
-	}
-	else {
-		piston(tilt, true, clamped);
-		pros::delay(500);
-		piston(backClamp, true, clamped);
-	}
-}
-
-
-void clamp_killer(bool down) {
-	piston(flap, false, down);
-}
-
-
-void swiper(bool down) {
-	piston(wings, false, down);
 }
 
 
@@ -360,7 +332,12 @@ void autonomous() {
 
 
 void opcontrol() {
+	bool backClampToggle = false;
+	bool frontClampToggle = false;
+	bool flapToggle = false;
+	bool swiperToggle = false;
 	pros::lcd::set_text(2, "User Control");
+	
 	while(true){
 		tank_drive(master);
 
@@ -376,14 +353,6 @@ void opcontrol() {
 			lift.moveVelocity(0);
 		}
 		
-		// clamp
-		if(master.getDigital(ControllerDigital::Y) || partner.getDigital(ControllerDigital::Y)) {
-			frontClamp.set_value(true);
-		}
-		else if(master.getDigital(ControllerDigital::B) || partner.getDigital(ControllerDigital::B)) {
-			frontClamp.set_value(false);
-		}
-		
 		// MOGO stuff
 		// intake
 		if(master.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
@@ -395,36 +364,54 @@ void opcontrol() {
 		else {
 			intake.moveVelocity(0);
 		}
+
+		// clamp
+		if(master.getDigital(ControllerDigital::Y) || partner.getDigital(ControllerDigital::Y)) {
+			if (frontClampToggle) {
+				frontClampToggle = false;
+				piston(frontClamp, true, true);
+				pros::delay(200);
+			}
+			else {
+				frontClampToggle = true;
+				piston(frontClamp, true, false);
+				pros::delay(200);
+			}
+			
+		}
 		
 		// mogo grab and tilt
-		if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
-			// pull in and tilt
-			backClamp.set_value(true);
-			pros::delay(500);
-			tilt.set_value(false);
-		}
-		else if(master.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
-			// push out and release
-			tilt.set_value(true);
-			pros::delay(500);
-			backClamp.set_value(false);
+		if(master.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
+			if (backClampToggle) {
+				backClampToggle = false;
+				piston(tilt, true, true);
+				pros::delay(500);
+				piston(backClamp, true, false);
+			}
+			else {
+				backClampToggle = true;
+				piston(backClamp, true, true);
+				pros::delay(500);
+				piston(tilt, true, false);
+			}
+			
 		}
 
 		// the uncreachable buttons
 		// clamp killer / top ring scorer
 		if(master.getDigital(ControllerDigital::up) || partner.getDigital(ControllerDigital::up)) {
-			flap.set_value(true);
+			piston(flap, false, true);
 		}
 		else if(master.getDigital(ControllerDigital::left) || partner.getDigital(ControllerDigital::left)) {
-			flap.set_value(false);
+			piston(flap, false, false);
 		}
 
 		// some safety features?
 		if(master.getDigital(ControllerDigital::X) || partner.getDigital(ControllerDigital::X)) {
+			piston(wings, false, true);
 		}
 		else if(master.getDigital(ControllerDigital::A) || partner.getDigital(ControllerDigital::A)) {
-		}
-		else {
+			piston(wings, false, false);
 		}
 		
 		pros::delay(10);
