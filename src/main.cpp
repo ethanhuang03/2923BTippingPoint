@@ -385,13 +385,13 @@ void opcontrol() {
 			if (backClampToggle) {
 				backClampToggle = false;
 				piston(tilt, true, true);
-				pros::delay(500);
+				pros::delay(250);
 				piston(backClamp, true, false);
 			}
 			else {
 				backClampToggle = true;
 				piston(backClamp, true, true);
-				pros::delay(500);
+				pros::delay(250);
 				piston(tilt, true, false);
 			}
 			
