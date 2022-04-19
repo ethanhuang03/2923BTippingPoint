@@ -377,11 +377,10 @@ void opcontrol() {
 				piston(frontClamp, true, false);
 				pros::delay(200);
 			}
-			
 		}
 		
 		// mogo grab and tilt
-		if(master.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
+		if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
 			if (backClampToggle) {
 				backClampToggle = false;
 				piston(tilt, true, true);
