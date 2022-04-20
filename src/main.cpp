@@ -362,10 +362,10 @@ void opcontrol() {
 		// MOGO stuff
 		// intake
 		if(master.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
-			intake.moveVelocity(600);
+			intake.moveVelocity(540);
 		}
 		else if(master.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
-			intake.moveVelocity(-600);
+			intake.moveVelocity(-540);
 		}
 		else {
 			intake.moveVelocity(0);
