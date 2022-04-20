@@ -336,8 +336,7 @@ void opcontrol() {
 	bool frontClampToggle = false;
 	bool swiperToggle = false;
 	bool flapToggle = false;
-	bool flapToggle = false;
-	bool swiperToggle = false;
+
 	pros::lcd::set_text(2, "User Control");
 	
 	while(true){
