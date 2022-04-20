@@ -334,6 +334,8 @@ void autonomous() {
 void opcontrol() {
 	bool backClampToggle = false;
 	bool frontClampToggle = false;
+	bool swiperToggle = false;
+	bool flapToggle = false;
 	bool flapToggle = false;
 	bool swiperToggle = false;
 	pros::lcd::set_text(2, "User Control");
@@ -396,22 +398,31 @@ void opcontrol() {
 			
 		}
 
-		// the uncreachable buttons
-		// clamp killer / top ring scorer
-		if(master.getDigital(ControllerDigital::up) || partner.getDigital(ControllerDigital::up)) {
-			piston(flap, false, true);
-		}
-		else if(master.getDigital(ControllerDigital::left) || partner.getDigital(ControllerDigital::left)) {
-			piston(flap, false, false);
+		if(master.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
+			if (swiperToggle) {
+				swiperToggle = false;
+				piston(wings, false, true);
+				pros::delay(200);
+			}
+			else {
+				swiperToggle = true;
+				piston(wings, false, false);
+				pros::delay(200);
+			}
 		}
 
-		// some safety features?
-		if(master.getDigital(ControllerDigital::X) || partner.getDigital(ControllerDigital::X)) {
-			piston(wings, false, true);
-		}
-		else if(master.getDigital(ControllerDigital::A) || partner.getDigital(ControllerDigital::A)) {
-			piston(wings, false, false);
-		}
+		if(master.getDigital(ControllerDigital::B) || partner.getDigital(ControllerDigital::B)) {
+			if (flapToggle) {
+				flapToggle = false;
+				piston(flap, false, true);
+				pros::delay(200);
+			}
+			else {
+				flapToggle = true;
+				piston(flap, false, false);
+				pros::delay(200);
+			}
+		}	
 		
 		pros::delay(10);
 	}
