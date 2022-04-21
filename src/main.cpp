@@ -158,9 +158,24 @@ void tank_drive(Controller controller) {
 void skills() {}
 
 
-void left() {}
+void left() {
+	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->driveToPoint({3_ft, 6_ft});
+	piston(frontClamp, true, true);
+	if (frontBumper.isPressed()) {
+		drive->driveToPoint({1.5_ft, 2_ft}, true);
+	}
+}
 
-void right() {}
+
+void right() {
+	drive->setState({9_ft, 2_in, 0_deg});
+	drive->driveToPoint({9_ft, 6_ft});
+	piston(frontClamp, true, true);
+	if (frontBumper.isPressed()) {
+		drive->driveToPoint({9_ft, 2_ft}, true);
+	}
+}
 
 
 void left_middle() {
