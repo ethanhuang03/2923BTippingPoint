@@ -117,20 +117,13 @@ void initialize() {
 			rightRotationSensor,
 			centerRotationSensor
 		)
-    	.withOdometry({{2.86_in, 22.65_cm, 3.5_in, 2.86_in}, quadEncoderTPR}) //2.86 8.5
+    	.withOdometry({{2.86_in, 22.65_cm, 3.5_in, 2.86_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.86 8.5
 		.withGains(
 			{0.0015, 0.0001, 0}, // Distance controller gains
 			{0.00275, 0.00017, 0.00006}, // Turn controller gains 0.00295, p=0.00275
 			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
 		// Stuff Below Here is Experimental
-		/*
-		.withDerivativeFilters(
-			std::make_unique<AverageFilter<3>>(), // Distance controller filter
-			std::make_unique<AverageFilter<3>>(), // Turn controller filter
-			std::make_unique<AverageFilter<3>>()  // Angle controller filter
-		)
-		*/
 		.withClosedLoopControllerTimeUtil(50, 5, 250_ms) // The minimum error to be considered settled, error derivative to be considered settled, time within atTargetError to be considered settled
 		.buildOdometry();
 
@@ -165,163 +158,115 @@ void tank_drive(Controller controller) {
 void skills() {}
 
 
-void left() {
-	drive->driveToPoint({3.7_ft, 0.7_ft}); // goal around half a foot
-	piston(frontClamp, true, true); // clamp the goal
-	pros::delay(200);
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
-	}
-	drive->driveToPoint({1_ft, 3.5_ft}, true); // good position
-}
+void left() {}
+
+void right() {}
 
 
 void left_middle() {
-	drive->driveToPoint({3.7_ft, 0.7_ft}); // goal around half a foot
-	piston(frontClamp, true, true); // clamp the goal
-	pros::delay(200);
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
-	}
-	else { // go for middle goal
-		piston(frontClamp, true, false); // reopen the clamp
-		drive->driveToPoint({3.7_ft, 3.3_ft}); // drive towards goal
-		piston(frontClamp, true, true); // clamp the goal
-		pros::delay(200);
-		drive->driveToPoint({1_ft, 3.5_ft}, true); // good position
-	}
-}
-
-
-void right() {
-	drive->setState({0_in, 0_in, 0_deg});
-	drive->driveToPoint({4.2_ft, 0_ft}); // goal around half a foot
+	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->driveToPoint({3_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
-		drive->driveToPoint({0_ft, 0_ft}, true); // has goal, continue to drive back
+		drive->driveToPoint({1.5_ft, 2_ft}, true);
 	}
-	else { // go for middle goal
-		drive->driveToPoint({5_ft, 0_ft});
-		drive->turnToAngle(80_deg); // face the alliance goal
-		drive->moveDistance(-2.2_ft); // drive into alliance goal
-
-		piston(backClamp, true, true);
-		pros::delay(250);
-		piston(tilt, true, false);
-
-		drive->driveToPoint({2.2_ft, -2.2_ft});
-    	asyncLift->setTarget(50); // raise the lift
-		drive->turnToAngle(-90_deg); // positioned at rings
-		intake.moveVelocity(100); // intake rings
-		drive->driveToPoint({2.2_ft, -6_ft});
-		drive->driveToPoint({2.2_ft, -3_ft}, true);
-		drive->turnToAngle(0_deg); // face forward
+	else {
+		piston(frontClamp, true, false);
+		drive->driveToPoint({3_ft, 4_ft}, true);
+		drive->driveToPoint({6_ft, 6_ft});
+		piston(frontClamp, true, true);
+		drive->driveToPoint({1.5_ft, 2_ft}, true);
+		drive->turnToAngle(0_deg);
 	}
 }
 
 
 void right_middle() {
-	drive->driveToPoint({3.7_ft, 0_ft}); // goal around half a foot
+	drive->setState({9_ft, 2_in, 0_deg});
+	drive->driveToPoint({9_ft, 6_ft});
 	piston(frontClamp, true, true);
-	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
+		drive->driveToPoint({9_ft, 2_ft}, true);
 	}
-	else { // go for middle goal
-		piston(frontClamp, true, false); // reopen the clamp
-		drive->driveToPoint({2.9_ft, 0_ft}, true);
-		drive->driveToPoint({3.8_ft, -3_ft}); // drive towards goal
-		pros::delay(200);
-		piston(frontClamp, true, true); // reopen the clamp
-		pros::delay(200);
-		drive->driveToPoint({1.4_ft, 0_ft}, true);
-		drive->turnToAngle(-80_deg); // face the alliance goal
-		drive->moveDistance(-2.2_ft); //drive into alliance goal
+	else {
+		piston(frontClamp, true, false);
+		drive->driveToPoint({9_ft, 4_ft}, true);
+		drive->driveToPoint({6_ft, 6_ft});
+		piston(frontClamp, true, true);
+		drive->driveToPoint({11_ft, 3_ft}, true);
 
-		piston(backClamp, true, true);
+		piston(tilt, true, true);
 		pros::delay(250);
-		piston(tilt, true, false);
-
-		drive->driveToPoint({2.2_ft, -2.2_ft});
-    	asyncLift->setTarget(50); // raise the lift
-		drive->turnToAngle(-90_deg); // positioned at rings
-		intake.moveVelocity(100); // intake rings
-		drive->driveToPoint({2.2_ft, -6_ft});
-		drive->driveToPoint({2.2_ft, -3_ft}, true);
-		drive->turnToAngle(0_deg); // face forward
+		piston(backClamp, true, false);
+		
+		drive->driveToPoint({10_ft, 4_ft});
+		drive->turnToAngle(0_deg);
+		asyncLift->setTarget(50);
+		intake.moveVelocity(600);
+		drive->driveToPoint({10_ft, 6_ft});
+		drive->driveToPoint({10_ft, 2_ft}, true);
 	}
 }
 
 
 void middle_left() {
-	drive->driveToPoint({4_ft, 3.8_ft}); // goal around half a foot
-	piston(frontClamp, true, true); // clamp the goal
-	pros::delay(200);
+	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->driveToPoint({6_ft, 6_ft});
+	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
-		drive->driveToPoint({0_ft, 0_ft}, true); // has goal, continue to drive back
+		drive->driveToPoint({1.5_ft, 2_ft}, true);
 	}
-	else { // good position
-		drive->driveToPoint({2.2_ft, -6_ft});
-		drive->driveToPoint({2.2_ft, -3_ft}, true);
-		drive->turnToAngle(0_deg); // face forward
+	else {
+		piston(frontClamp, true, false);
+		drive->driveToPoint({4_ft, 4_ft}, true);
+		drive->driveToPoint({3_ft, 6_ft});
+		piston(frontClamp, true, true);
+		if (frontBumper.isPressed()) {
+			drive->driveToPoint({1.5_ft, 2_ft}, true);
+		}
 	}
 }
 
 
 void middle_right() {
-	drive->driveToPoint({4_ft, -2.4_ft}); // goal around half a foot
+	drive->setState({9_ft, 2_in, 0_deg});
+	drive->driveToPoint({6_ft, 6_ft});
 	piston(frontClamp, true, true);
-	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		drive->driveToPoint({0_ft, 0_ft}, true); // has goal, continue to drive back
+		drive->driveToPoint({9_ft, 2_in}, true);
 	}
-	else { // good position
-		drive->driveToPoint({2.2_ft, -3_ft}, true);
-		drive->turnToAngle(0_deg); // face forward
+	else {
+		piston(frontClamp, true, false);
+		drive->driveToPoint({8_ft, 4_ft}, true);
+		drive->driveToPoint({9_ft, 6_ft});
+		piston(frontClamp, true, true);
+		if(frontBumper.isPressed()) {
+			drive->driveToPoint({9_ft, 2_ft}, true);
+		}
 	}
 }
 
 
 void wings_left() {
-	drive->driveToPoint({2.7_ft, 0.7_ft}); // goal around half a foot
-	drive->turnToAngle(40_deg); // swat goal
-	drive->moveDistance(1.8_ft); // move forward towards goal
+	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->driveToPoint({3_ft, 5_ft});
+	drive->turnToAngle(90_deg);
+	drive->driveToPoint({4_ft, 5_ft});
 	piston(frontClamp, true, true);
-	pros::delay(200);
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
-	}
-	else { // go for middle goal
-		drive->driveToPoint({1_ft, 3.5_ft}, true); // good position
+	if(frontBumper.isPressed()) {
+		drive->driveToPoint({1.5_ft, 2_ft}, true);
 	}
 }
 
 
 void wings_right() {
-	drive->driveToPoint({2.7_ft, 0_ft}); // goal around half a foot
-	drive->turnToAngle(40_deg); // swat goal
-	drive->moveDistance(1.8_ft); // move forward towards goal
+	drive->setState({9_ft, 2_in, 0_deg});
+	drive->driveToPoint({9_ft, 5_ft});
+	drive->turnToAngle(-90_deg);
+	drive->driveToPoint({8_ft, 5_ft});
 	piston(frontClamp, true, true);
-	pros::delay(200);
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
-	}
-	else { // go for alliance goal
-		drive->driveToPoint({1.6_ft, 0_ft}, true);
-		drive->turnToAngle(-80_deg); // face the alliance goal
-		drive->moveDistance(-2.2_ft); //drive into alliance goal
-
-		piston(backClamp, true, true);
-		pros::delay(250);
-		piston(tilt, true, false);
-
-		drive->driveToPoint({2.2_ft, -2.2_ft});
-    	asyncLift->setTarget(50); // raise the lift
-		drive->turnToAngle(-90_deg); // positioned at rings
-		intake.moveVelocity(100); // intake rings
-		drive->driveToPoint({2.2_ft, -6_ft});
-		drive->driveToPoint({2.2_ft, -3_ft}, true);
-		drive->turnToAngle(0_deg); // face forward
+	if(frontBumper.isPressed()) {
+		drive->driveToPoint({9_ft, 2_ft}, true);
 	}
 }
 
