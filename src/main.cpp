@@ -101,8 +101,7 @@ void intake_switcher(bool toggle) {
 
 void initialize() {
 	selector::init();
-	piston(backClamp, true, false);
-	piston(frontClamp, true, false);
+	
 	drive = ChassisControllerBuilder()
 		.withLogger(
 			std::make_shared<Logger>(
@@ -118,18 +117,20 @@ void initialize() {
 			rightRotationSensor,
 			centerRotationSensor
 		)
-    	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR})
+    	.withOdometry({{2.86_in, 22.65_cm, 3.5_in, 2.86_in}, quadEncoderTPR}) //2.86 8.5
 		.withGains(
 			{0.0015, 0.0001, 0}, // Distance controller gains
-			{0, 0, 0}, // Turn controller gains 0.00295
+			{0.00275, 0.00017, 0.00006}, // Turn controller gains 0.00295, p=0.00275
 			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
 		// Stuff Below Here is Experimental
+		/*
 		.withDerivativeFilters(
 			std::make_unique<AverageFilter<3>>(), // Distance controller filter
 			std::make_unique<AverageFilter<3>>(), // Turn controller filter
 			std::make_unique<AverageFilter<3>>()  // Angle controller filter
 		)
+		*/
 		.withClosedLoopControllerTimeUtil(50, 5, 250_ms) // The minimum error to be considered settled, error derivative to be considered settled, time within atTargetError to be considered settled
 		.buildOdometry();
 
@@ -193,17 +194,15 @@ void left_middle() {
 
 
 void right() {
-	drive->driveToPoint({5.7_ft, 0_ft});
-	/*
-	drive->driveToPoint({3.7_ft, 0_ft}); // goal around half a foot
+	drive->setState({0_in, 0_in, 0_deg});
+	drive->driveToPoint({4.2_ft, 0_ft}); // goal around half a foot
 	piston(frontClamp, true, true);
-	pros::delay(200);
 	if (frontBumper.isPressed()) {
-		drive->driveToPoint({-1_ft, 0_ft}, true); // has goal, continue to drive back
+		drive->driveToPoint({0_ft, 0_ft}, true); // has goal, continue to drive back
 	}
 	else { // go for middle goal
-		drive->driveToPoint({1.6_ft, 0_ft}, true);
-		drive->turnToAngle(-80_deg); // face the alliance goal
+		drive->driveToPoint({5_ft, 0_ft});
+		drive->turnToAngle(80_deg); // face the alliance goal
 		drive->moveDistance(-2.2_ft); // drive into alliance goal
 
 		piston(backClamp, true, true);
@@ -218,7 +217,6 @@ void right() {
 		drive->driveToPoint({2.2_ft, -3_ft}, true);
 		drive->turnToAngle(0_deg); // face forward
 	}
-	*/
 }
 
 
@@ -329,7 +327,9 @@ void wings_right() {
 
 
 void autonomous() {
-	drive->setState({0_in, 0_in, 0_deg});
+	piston(backClamp, true, false);
+	piston(frontClamp, true, false);
+	
 	if(selector::auton == 1) { // Red Left
 		left();
 	}
