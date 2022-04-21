@@ -101,6 +101,8 @@ void initialize() {
 	asyncLift = AsyncPosControllerBuilder()
     	.withMotor(8) // lift motor port 8
     	.build();
+
+	lift.setBrakeMode(AbstractMotor::brakeMode::hold);
 }
 
 
@@ -342,7 +344,7 @@ void opcontrol() {
 	bool flapToggle = false;
 	bool driverToggle = false;
 	driver = master;
-	
+	int intakeDirection = 0;
 	while(true){
 		tank_drive(driver);
 
@@ -374,13 +376,28 @@ void opcontrol() {
 		// MOGO stuff
 		// intake
 		if(master.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
-			intake.moveVelocity(540);
+			if (intakeDirection == 1) {
+				intakeDirection = 0;
+				intake.moveVelocity(0);
+				pros::delay(250);
+			}
+			else {
+				intakeDirection = 1;
+				intake.moveVelocity(600);
+				pros::delay(250);
+			}
 		}
 		else if(master.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
-			intake.moveVelocity(-540);
-		}
-		else {
-			intake.moveVelocity(0);
+			if (intakeDirection == -1) {
+				intakeDirection = 0;
+				intake.moveVelocity(0);
+				pros::delay(250);
+			}
+			else {
+				intakeDirection = -1;
+				intake.moveVelocity(-600);
+				pros::delay(250);
+			}
 		}
 		// mogo grab and tilt
 		if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
