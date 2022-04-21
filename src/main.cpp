@@ -3,7 +3,7 @@
 
 Controller master(ControllerId::master);
 Controller partner(ControllerId::partner);
-Controller driver;
+Controller driver = master;
 
 std::shared_ptr<OdomChassisController> drive;
 std::shared_ptr<AsyncMotionProfileController> driveController;
@@ -26,13 +26,16 @@ RotationSensor rightRotationSensor(12, true);
 RotationSensor centerRotationSensor(11);
 //IMU interialSensor(11);
 
-ADIButton frontBumper('F');
+ADIButton frontBumper('H');
 
 pros::ADIDigitalOut tilt('B');
 pros::ADIDigitalOut backClamp('A');
 pros::ADIDigitalOut frontClamp('C');
 pros::ADIDigitalOut flap('D');
 pros::ADIDigitalOut wings('E');
+
+bool intake_toggle = false;
+int intakeDirection = 0;
 
 
 void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
@@ -55,6 +58,47 @@ void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
 }
 
 
+void intake_switcher(bool toggle) {
+	if(toggle) {
+		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
+			if (intakeDirection == 1) {
+				intakeDirection = 0;
+				intake.moveVelocity(0);
+				pros::delay(250);
+			}
+			else {
+				intakeDirection = 1;
+				intake.moveVelocity(600);
+				pros::delay(250);
+			}
+		}
+		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
+			if (intakeDirection == -1) {
+				intakeDirection = 0;
+				intake.moveVelocity(0);
+				pros::delay(250);
+			}
+			else {
+				intakeDirection = -1;
+				intake.moveVelocity(-600);
+				pros::delay(250);
+			}
+		}
+	}
+	else{
+		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
+			intake.moveVelocity(600);
+		}
+		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
+			intake.moveVelocity(-600);
+		}
+		else {
+			intake.moveVelocity(0);
+		}
+	}
+}
+
+
 void initialize() {
 	selector::init();
 	piston(backClamp, true, false);
@@ -68,7 +112,7 @@ void initialize() {
 			)
 		)
 		.withMotors(LeftDrive, RightDrive)
-		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 14.8333_in}, imev5BlueTPR})
+		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 37.8_cm}, imev5BlueTPR})
 		.withSensors(
 			leftRotationSensor,
 			rightRotationSensor,
@@ -76,9 +120,9 @@ void initialize() {
 		)
     	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR})
 		.withGains(
-			{0.002, 0, 0.000197}, // Distance controller gains
-			{0.00295, 0, 0.000090}, // Turn controller gains 0.00295
-			{0.002, 0, 0.0001}  // Angle controller gains (helps drive straight)
+			{0.0015, 0.0001, 0}, // Distance controller gains
+			{0, 0, 0}, // Turn controller gains 0.00295
+			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
 		// Stuff Below Here is Experimental
 		.withDerivativeFilters(
@@ -149,6 +193,8 @@ void left_middle() {
 
 
 void right() {
+	drive->driveToPoint({5.7_ft, 0_ft});
+	/*
 	drive->driveToPoint({3.7_ft, 0_ft}); // goal around half a foot
 	piston(frontClamp, true, true);
 	pros::delay(200);
@@ -172,6 +218,7 @@ void right() {
 		drive->driveToPoint({2.2_ft, -3_ft}, true);
 		drive->turnToAngle(0_deg); // face forward
 	}
+	*/
 }
 
 
@@ -344,63 +391,40 @@ void opcontrol() {
 	bool flapToggle = false;
 	bool driverToggle = false;
 	driver = master;
-	int intakeDirection = 0;
+
 	while(true){
 		tank_drive(driver);
 
 		// Front Goal related stuff on the right hand
 		// lift
-		if(master.getDigital(ControllerDigital::R1) || partner.getDigital(ControllerDigital::R1)) {
+		if(driver.getDigital(ControllerDigital::R1) || partner.getDigital(ControllerDigital::R1)) {
 			lift.moveVelocity(100);
 		}
-		else if(master.getDigital(ControllerDigital::R2) || partner.getDigital(ControllerDigital::R2)) {
+		else if(driver.getDigital(ControllerDigital::R2) || partner.getDigital(ControllerDigital::R2)) {
 			lift.moveVelocity(-100);
 		}
 		else {
 			lift.moveVelocity(0);
 		}
 		// clamp
-		if(master.getDigital(ControllerDigital::Y) || partner.getDigital(ControllerDigital::Y)) {
+		if(driver.getDigital(ControllerDigital::Y) || partner.getDigital(ControllerDigital::Y)) {
 			if (frontClampToggle) {
 				frontClampToggle = false;
-				piston(frontClamp, true, true);
+				piston(frontClamp, true, false);
 				pros::delay(200);
 			}
 			else {
 				frontClampToggle = true;
-				piston(frontClamp, true, false);
+				piston(frontClamp, true, true);
 				pros::delay(200);
 			}
 		}
 		
 		// MOGO stuff
 		// intake
-		if(master.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
-			if (intakeDirection == 1) {
-				intakeDirection = 0;
-				intake.moveVelocity(0);
-				pros::delay(250);
-			}
-			else {
-				intakeDirection = 1;
-				intake.moveVelocity(600);
-				pros::delay(250);
-			}
-		}
-		else if(master.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
-			if (intakeDirection == -1) {
-				intakeDirection = 0;
-				intake.moveVelocity(0);
-				pros::delay(250);
-			}
-			else {
-				intakeDirection = -1;
-				intake.moveVelocity(-600);
-				pros::delay(250);
-			}
-		}
+		intake_switcher(intake_toggle);
 		// mogo grab and tilt
-		if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
+		if(driver.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
 			if (backClampToggle) {
 				backClampToggle = false;
 				piston(tilt, true, true);
@@ -417,7 +441,7 @@ void opcontrol() {
 
 		// MISC stuff
 		// swiper
-		if(master.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
+		if(driver.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
 			if (swiperToggle) {
 				swiperToggle = false;
 				piston(wings, false, true);
@@ -430,7 +454,7 @@ void opcontrol() {
 			}
 		}
 		// flap
-		if(master.getDigital(ControllerDigital::B) || partner.getDigital(ControllerDigital::B)) {
+		if(driver.getDigital(ControllerDigital::B) || partner.getDigital(ControllerDigital::B)) {
 			if (flapToggle) {
 				flapToggle = false;
 				piston(flap, false, true);
@@ -443,8 +467,8 @@ void opcontrol() {
 			}
 		}
 		// auto clamp
-		if(partner.getDigital(ControllerDigital::A) && frontBumper.isPressed() && frontClampToggle) {
-				frontClampToggle = false;
+		if(partner.getDigital(ControllerDigital::A) && frontBumper.isPressed() && !frontClampToggle) {
+				frontClampToggle = true;
 				piston(frontClamp, true, true);
 				pros::delay(200);
 		}
@@ -452,12 +476,14 @@ void opcontrol() {
 		if(partner.getDigital(ControllerDigital::X)) {
 			if (driverToggle) {
 				driverToggle = false;
-				driver = partner;
+				driver = master;
+				intake_toggle = false;
 				pros::delay(200);
 			}
 			else {
 				driverToggle = true;
-				driver = master;
+				driver = partner;
+				intake_toggle = true;
 				pros::delay(200);
 			}
 		}
@@ -471,12 +497,11 @@ void opcontrol() {
 
 		// AUTOMATION
 		// intake unjammer
-		if(intake.getActualVelocity() < 20 && intake.getTargetVelocity() > 20) {
-			intake.moveRelative(-100, 100);
+		/*
+		if(intake.getActualVelocity() < 20 && intake.getTargetVelocity() > 20 && intake_toggle) {
+			intake.moveRelative(-600, 600);
 		}
-
-
-		
+		*/
 		pros::delay(10);
 	}
 }
