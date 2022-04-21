@@ -117,10 +117,10 @@ void initialize() {
 			rightRotationSensor,
 			centerRotationSensor
 		)
-    	.withOdometry({{2.86_in, 22.65_cm, 3.5_in, 2.86_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.86 8.5
+    	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.86 8.5
 		.withGains(
-			{0.0015, 0.0001, 0}, // Distance controller gains
-			{0.00275, 0.00017, 0.00006}, // Turn controller gains 0.00295, p=0.00275
+			{0, 0, 0}, // Distance controller gains
+			{0, 0, 0}, // Turn controller gains 0.00295, p=0.00275
 			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
 		// Stuff Below Here is Experimental
