@@ -141,6 +141,38 @@ void initialize() {
     	.build();
 
 	lift.setBrakeMode(AbstractMotor::brakeMode::hold);
+
+	while(true) {
+		if(master.getDigital(ControllerDigital::left) || partner.getDigital(ControllerDigital::left)) {
+			drive->setState({0_ft, 0_ft, 0_deg}); //needs to be offset
+			master.setText(0, 0, "0ft, 0ft, 0deg");
+			partner.setText(0, 0, "0ft, 0ft, 0deg");
+			break;
+		}
+		else if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
+			drive->setState({12_ft, 0_ft, 0_deg});
+			master.setText(0, 0, "12ft, 0ft, 0deg");
+			partner.setText(0, 0, "12ft, 0ft, 0deg");
+			break; //needs to be offset
+		}
+	}
+	master.clear();
+	partner.clear();
+	while(true) {
+		master.clearLine(1);
+		partner.clearLine(1);
+		auto state = drive->getState();
+		if(master.getDigital(ControllerDigital::A) || partner.getDigital(ControllerDigital::A)) {
+			drive->setState(state);
+			master.setText(2, 0, state.str());
+			partner.setText(2, 0, state.str());
+			break;
+		}
+		printf("%s\n", state.str().c_str());
+		master.setText(0, 0, state.x);
+		master.setText(1, 0, state.y);
+		partner.setText(2, 0, state.theta);
+	}
 }
 
 
@@ -159,7 +191,7 @@ void skills() {}
 
 
 void left() {
-	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->setState({1.5_ft, 2_ft, 0_deg});
 	drive->driveToPoint({3_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
@@ -169,7 +201,7 @@ void left() {
 
 
 void right() {
-	drive->setState({9_ft, 2_in, 0_deg});
+	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({9_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
@@ -179,7 +211,7 @@ void right() {
 
 
 void left_middle() {
-	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->setState({1.5_ft, 2_ft, 0_deg});
 	drive->driveToPoint({3_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
@@ -197,7 +229,7 @@ void left_middle() {
 
 
 void right_middle() {
-	drive->setState({9_ft, 2_in, 0_deg});
+	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({9_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
@@ -225,7 +257,7 @@ void right_middle() {
 
 
 void middle_left() {
-	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->setState({1.5_ft, 2_ft, 0_deg});
 	drive->driveToPoint({6_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
@@ -244,11 +276,11 @@ void middle_left() {
 
 
 void middle_right() {
-	drive->setState({9_ft, 2_in, 0_deg});
+	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({6_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
-		drive->driveToPoint({9_ft, 2_in}, true);
+		drive->driveToPoint({9_ft, 2_ft}, true);
 	}
 	else {
 		piston(frontClamp, true, false);
@@ -263,7 +295,8 @@ void middle_right() {
 
 
 void swiper_left() {
-	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->setState({1.5_ft, 2_ft, 0_deg});
+	piston(swiper, false, true);
 	drive->driveToPoint({3_ft, 5_ft});
 	drive->turnToAngle(90_deg);
 	drive->driveToPoint({4_ft, 5_ft});
@@ -271,11 +304,13 @@ void swiper_left() {
 	if(frontBumper.isPressed()) {
 		drive->driveToPoint({1.5_ft, 2_ft}, true);
 	}
+	piston(swiper, false, false);
 }
 
 
 void swiper_right() {
-	drive->setState({9_ft, 2_in, 0_deg});
+	drive->setState({9_ft, 2_ft, 0_deg});
+	piston(swiper, false, true);
 	drive->driveToPoint({9_ft, 5_ft});
 	drive->turnToAngle(-90_deg);
 	drive->driveToPoint({8_ft, 5_ft});
@@ -283,6 +318,7 @@ void swiper_right() {
 	if(frontBumper.isPressed()) {
 		drive->driveToPoint({9_ft, 2_ft}, true);
 	}
+	piston(swiper, false, false);
 }
 
 
