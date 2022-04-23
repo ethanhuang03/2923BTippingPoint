@@ -28,11 +28,11 @@ RotationSensor centerRotationSensor(11);
 
 ADIButton frontBumper('H');
 
-pros::ADIDigitalOut tilt('B');
 pros::ADIDigitalOut backClamp('A');
-pros::ADIDigitalOut frontClamp('C');
-pros::ADIDigitalOut flap('D');
-pros::ADIDigitalOut wings('E');
+pros::ADIDigitalOut tilt('B');
+pros::ADIDigitalOut frontClamp('D');
+pros::ADIDigitalOut flap('C');
+pros::ADIDigitalOut swiper('E');
 
 bool intake_toggle = false;
 int intakeDirection = 0;
@@ -262,7 +262,7 @@ void middle_right() {
 }
 
 
-void wings_left() {
+void swiper_left() {
 	drive->setState({1.5_ft, 2_in, 0_deg});
 	drive->driveToPoint({3_ft, 5_ft});
 	drive->turnToAngle(90_deg);
@@ -274,7 +274,7 @@ void wings_left() {
 }
 
 
-void wings_right() {
+void swiper_right() {
 	drive->setState({9_ft, 2_in, 0_deg});
 	drive->driveToPoint({9_ft, 5_ft});
 	drive->turnToAngle(-90_deg);
@@ -308,11 +308,11 @@ void autonomous() {
 	else if(selector::auton == 6) { // Red Middle (From Right)
 		middle_right();
 	}
-	else if(selector::auton == 7) { // Wings (Left)
-		wings_left();
+	else if(selector::auton == 7) { // swiper (Left)
+		swiper_left();
 	}
-	else if(selector::auton == 8) { // Wings (Right)
-		wings_right();
+	else if(selector::auton == 8) { // swiper (Right)
+		swiper_right();
 	}
 	else if(selector::auton == -1) { // Blue Left
 		left();
@@ -332,11 +332,11 @@ void autonomous() {
 	else if(selector::auton == -6) { // Blue Middle (From Right)
 		middle_right();
 	}
-	else if(selector::auton == -7) { // Wings (Left)
-		wings_left();
+	else if(selector::auton == -7) { // swiper (Left)
+		swiper_left();
 	}
-	else if(selector::auton == -8) { // Wings (Right)
-		wings_right();
+	else if(selector::auton == -8) { // swiper (Right)
+		swiper_right();
 	}
 	else if(selector::auton == 0){ //Skills
 		skills();
@@ -404,12 +404,12 @@ void opcontrol() {
 		if(driver.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
 			if (swiperToggle) {
 				swiperToggle = false;
-				piston(wings, false, true);
+				piston(swiper, false, true);
 				pros::delay(200);
 			}
 			else {
 				swiperToggle = true;
-				piston(wings, false, false);
+				piston(swiper, false, false);
 				pros::delay(200);
 			}
 		}
