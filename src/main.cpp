@@ -36,7 +36,6 @@ pros::ADIDigitalOut swiper('E');
 
 bool intake_toggle = false;
 int intakeDirection = 0;
-int intakeUnjammer = 0;
 
 
 void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
@@ -59,15 +58,6 @@ void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
 }
 
 
-void select_side() {
-	if
-}
-
-
-void move_to_pos() {
-
-}
-
 void initialize() {
 	selector::init();
 	
@@ -86,9 +76,9 @@ void initialize() {
 			rightRotationSensor,
 			centerRotationSensor
 		)
-    	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.86 8.5
+    	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.75_in, 8.5_in, 3.5_in, 2.75_in |||||| 2.85_in, 22.65_cm, 3.5_in, 2.85_in
 		.withGains(
-			{0, 0, 0}, // Distance controller gains
+			{0.0015, 0, 0}, // Distance controller gains p=0.0015   --> 0.0018, 0.001, 0.00006
 			{0, 0, 0}, // Turn controller gains 0.00295, p=0.00275
 			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
@@ -142,20 +132,11 @@ void intake_switcher(bool toggle) {
 	else{
 		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
 			intake.moveVelocity(600);
-			intakeUnjammer += 1;
-            if(intake.getActualVelocity() < 20 && intakeUnjammer > 100) {
-				intake.moveVelocity(-600);
-				pros::delay(500);
-				intake.moveVelocity(0);				
-				intakeUnjammer = 0;
-			}
 		}
 		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
 			intake.moveVelocity(-600);
-			intakeUnjammer = 0;
 		}
 		else {
-			intakeUnjammer = 0;
 			intake.moveVelocity(0);
 		}
 	}
@@ -186,12 +167,16 @@ void left() {
 
 
 void right() {
+	drive->setState({0_ft, 0_ft, 0_deg});
+	drive->driveToPoint({0_ft, 6_ft});
+	/*   
 	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({9_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
 		drive->driveToPoint({9_ft, 2_ft}, true);
 	}
+	*/
 }
 
 
@@ -409,7 +394,7 @@ void opcontrol() {
 			if (backClampToggle) {
 				backClampToggle = false;
 				piston(tilt, true, true);
-				pros::delay(350);
+				pros::delay(450);
 				piston(backClamp, true, false);
 			}
 			else {
