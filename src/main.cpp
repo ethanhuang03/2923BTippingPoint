@@ -36,6 +36,7 @@ pros::ADIDigitalOut swiper('E');
 
 bool intake_toggle = false;
 int intakeDirection = 0;
+int intakeUnjammer = 0;
 
 
 void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
@@ -88,12 +89,21 @@ void intake_switcher(bool toggle) {
 	else{
 		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
 			intake.moveVelocity(600);
+			intakeUnjammer += 1;
+			if(intake.getActualVelocity() < 20 && intakeUnjammer > 100) {	
+				intake.moveVelocity(-600);
+				pros::delay(500);
+				intake.moveVelocity(600);
+				intakeUnjammer = 0;
+			}
 		}
 		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
 			intake.moveVelocity(-600);
+			intakeUnjammer = 0;
 		}
 		else {
 			intake.moveVelocity(0);
+			intakeUnjammer = 0;
 		}
 	}
 }
@@ -141,7 +151,7 @@ void initialize() {
     	.build();
 
 	lift.setBrakeMode(AbstractMotor::brakeMode::hold);
-
+	/*
 	while(true) {
 		if(master.getDigital(ControllerDigital::left) || partner.getDigital(ControllerDigital::left)) {
 			drive->setState({0_ft, 0_ft, 0_deg}); //needs to be offset
@@ -173,6 +183,7 @@ void initialize() {
 		master.setText(1, 0, state.y);
 		partner.setText(2, 0, state.theta);
 	}
+	*/
 }
 
 
