@@ -28,11 +28,11 @@ RotationSensor centerRotationSensor(11);
 
 ADIButton frontBumper('H');
 
-pros::ADIDigitalOut tilt('B');
 pros::ADIDigitalOut backClamp('A');
-pros::ADIDigitalOut frontClamp('C');
-pros::ADIDigitalOut flap('D');
-pros::ADIDigitalOut wings('E');
+pros::ADIDigitalOut tilt('B');
+pros::ADIDigitalOut frontClamp('D');
+pros::ADIDigitalOut flap('C');
+pros::ADIDigitalOut swiper('E');
 
 bool intake_toggle = false;
 int intakeDirection = 0;
@@ -117,10 +117,10 @@ void initialize() {
 			rightRotationSensor,
 			centerRotationSensor
 		)
-    	.withOdometry({{2.86_in, 22.65_cm, 3.5_in, 2.86_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.86 8.5
+    	.withOdometry({{2.75_in, 8.5_in, 3.5_in, 2.75_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.86 8.5
 		.withGains(
-			{0.0015, 0.0001, 0}, // Distance controller gains
-			{0.00275, 0.00017, 0.00006}, // Turn controller gains 0.00295, p=0.00275
+			{0, 0, 0}, // Distance controller gains
+			{0, 0, 0}, // Turn controller gains 0.00295, p=0.00275
 			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
 		// Stuff Below Here is Experimental
@@ -158,9 +158,24 @@ void tank_drive(Controller controller) {
 void skills() {}
 
 
-void left() {}
+void left() {
+	drive->setState({1.5_ft, 2_in, 0_deg});
+	drive->driveToPoint({3_ft, 6_ft});
+	piston(frontClamp, true, true);
+	if (frontBumper.isPressed()) {
+		drive->driveToPoint({1.5_ft, 2_ft}, true);
+	}
+}
 
-void right() {}
+
+void right() {
+	drive->setState({9_ft, 2_in, 0_deg});
+	drive->driveToPoint({9_ft, 6_ft});
+	piston(frontClamp, true, true);
+	if (frontBumper.isPressed()) {
+		drive->driveToPoint({9_ft, 2_ft}, true);
+	}
+}
 
 
 void left_middle() {
@@ -247,7 +262,7 @@ void middle_right() {
 }
 
 
-void wings_left() {
+void swiper_left() {
 	drive->setState({1.5_ft, 2_in, 0_deg});
 	drive->driveToPoint({3_ft, 5_ft});
 	drive->turnToAngle(90_deg);
@@ -259,7 +274,7 @@ void wings_left() {
 }
 
 
-void wings_right() {
+void swiper_right() {
 	drive->setState({9_ft, 2_in, 0_deg});
 	drive->driveToPoint({9_ft, 5_ft});
 	drive->turnToAngle(-90_deg);
@@ -293,11 +308,11 @@ void autonomous() {
 	else if(selector::auton == 6) { // Red Middle (From Right)
 		middle_right();
 	}
-	else if(selector::auton == 7) { // Wings (Left)
-		wings_left();
+	else if(selector::auton == 7) { // swiper (Left)
+		swiper_left();
 	}
-	else if(selector::auton == 8) { // Wings (Right)
-		wings_right();
+	else if(selector::auton == 8) { // swiper (Right)
+		swiper_right();
 	}
 	else if(selector::auton == -1) { // Blue Left
 		left();
@@ -317,11 +332,11 @@ void autonomous() {
 	else if(selector::auton == -6) { // Blue Middle (From Right)
 		middle_right();
 	}
-	else if(selector::auton == -7) { // Wings (Left)
-		wings_left();
+	else if(selector::auton == -7) { // swiper (Left)
+		swiper_left();
 	}
-	else if(selector::auton == -8) { // Wings (Right)
-		wings_right();
+	else if(selector::auton == -8) { // swiper (Right)
+		swiper_right();
 	}
 	else if(selector::auton == 0){ //Skills
 		skills();
@@ -389,12 +404,12 @@ void opcontrol() {
 		if(driver.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
 			if (swiperToggle) {
 				swiperToggle = false;
-				piston(wings, false, true);
+				piston(swiper, false, true);
 				pros::delay(200);
 			}
 			else {
 				swiperToggle = true;
-				piston(wings, false, false);
+				piston(swiper, false, false);
 				pros::delay(200);
 			}
 		}
