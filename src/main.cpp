@@ -36,7 +36,7 @@ pros::ADIDigitalOut swiper('E');
 
 bool intake_toggle = false;
 int intakeDirection = 0;
-int intakeUnjammer = 0;
+int intakeJammer = 0;
 
 
 void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
@@ -54,56 +54,6 @@ void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
 		}
 		else {
 			piston.set_value(false);
-		}
-	}
-}
-
-
-void intake_switcher(bool toggle) {
-	if(toggle) {
-		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
-			if (intakeDirection == 1) {
-				intakeDirection = 0;
-				intake.moveVelocity(0);
-				pros::delay(250);
-			}
-			else {
-				intakeDirection = 1;
-				intake.moveVelocity(600);
-				pros::delay(250);
-			}
-		}
-		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
-			if (intakeDirection == -1) {
-				intakeDirection = 0;
-				intake.moveVelocity(0);
-				pros::delay(250);
-			}
-			else {
-				intakeDirection = -1;
-				intake.moveVelocity(-600);
-				pros::delay(250);
-			}
-		}
-	}
-	else{
-		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
-			intake.moveVelocity(600);
-			intakeUnjammer += 1;
-			if(intake.getActualVelocity() < 20 && intakeUnjammer > 100) {	
-				intake.moveVelocity(-600);
-				pros::delay(500);
-				intake.moveVelocity(600);
-				intakeUnjammer = 0;
-			}
-		}
-		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
-			intake.moveVelocity(-600);
-			intakeUnjammer = 0;
-		}
-		else {
-			intake.moveVelocity(0);
-			intakeUnjammer = 0;
 		}
 	}
 }
@@ -151,41 +101,99 @@ void initialize() {
     	.build();
 
 	lift.setBrakeMode(AbstractMotor::brakeMode::hold);
-	/*
+
+	master.clear();
+	partner.clear();
+	bool confirm = false;
+	bool selected = false;
 	while(true) {
 		if(master.getDigital(ControllerDigital::left) || partner.getDigital(ControllerDigital::left)) {
+			master.clearLine(0);
+			partner.clearLine(0);
 			drive->setState({0_ft, 0_ft, 0_deg}); //needs to be offset
 			master.setText(0, 0, "0ft, 0ft, 0deg");
 			partner.setText(0, 0, "0ft, 0ft, 0deg");
-			break;
+			selected = true;
 		}
 		else if(master.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
+			master.clearLine(0);
+			partner.clearLine(0);
 			drive->setState({12_ft, 0_ft, 0_deg});
 			master.setText(0, 0, "12ft, 0ft, 0deg");
 			partner.setText(0, 0, "12ft, 0ft, 0deg");
-			break; //needs to be offset
+			selected = true;
+		}
+		if((master.getDigital(ControllerDigital::A) || partner.getDigital(ControllerDigital::A)) && selected == true) {
+			break;
 		}
 	}
-	master.clear();
-	partner.clear();
+
 	while(true) {
-		master.clearLine(1);
-		partner.clearLine(1);
+		master.clear();
+		partner.clear();
 		auto state = drive->getState();
 		if(master.getDigital(ControllerDigital::A) || partner.getDigital(ControllerDigital::A)) {
 			drive->setState(state);
-			master.setText(2, 0, state.str());
-			partner.setText(2, 0, state.str());
+			master.setText(0, 0, state.str());
+			partner.setText(0, 0, state.str());
 			break;
 		}
-		printf("%s\n", state.str().c_str());
-		master.setText(0, 0, state.x);
-		master.setText(1, 0, state.y);
-		partner.setText(2, 0, state.theta);
+		printf(state.str().c_str());
+		//master.setText(0, 0, state.x);
+		//master.setText(1, 0, state.y);
+		//partner.setText(2, 0, state.theta);
 	}
-	*/
+	
 }
 
+void intake_switcher(bool toggle) {
+	if(toggle) {
+		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
+			if (intakeDirection == 1) {
+				intakeDirection = 0;
+				intake.moveVelocity(0);
+				pros::delay(250);
+			}
+			else {
+				intakeDirection = 1;
+				intake.moveVelocity(600);
+				pros::delay(250);
+			}
+		}
+		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
+			if (intakeDirection == -1) {
+				intakeDirection = 0;
+				intake.moveVelocity(0);
+				pros::delay(250);
+			}
+			else {
+				intakeDirection = -1;
+				intake.moveVelocity(-600);
+				pros::delay(250);
+			}
+		}
+	}
+	else{
+		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
+			intake.moveVelocity(600);
+			intakeJammer += 1;
+			printf("%d", intakeJammer);
+            if(intake.getActualVelocity() < 20 && intakeJammer > 100) {
+
+                intake.moveRelative(-600, 600);
+				
+				intakeJammer = 0;
+			}
+		}
+		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
+			intake.moveVelocity(-600);
+		}
+		else {
+			intakeJammer = 0;
+			intake.moveVelocity(0);
+		}
+	}
+}
 
 void disabled() {}
 
@@ -435,7 +443,7 @@ void opcontrol() {
 			if (backClampToggle) {
 				backClampToggle = false;
 				piston(tilt, true, true);
-				pros::delay(250);
+				pros::delay(350);
 				piston(backClamp, true, false);
 			}
 			else {
