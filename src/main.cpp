@@ -152,14 +152,7 @@ void tank_drive(Controller controller) {
 void skills() {}
 
 
-void left() {
-	drive->setState({2_ft, 2_ft, 17_deg});
-	drive->driveToPoint({3_ft, 6_ft});
-	piston(frontClamp, true, true);
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({1.5_ft, 2_ft}, true);
-	}
-}
+void left() {}
 
 
 void right() {
@@ -174,6 +167,31 @@ void right() {
 
 
 void left_middle() {
+	driveController->generatePath({{2_ft, 2_ft, 17_deg}, {3_ft, 6_ft, 17_deg}}, "Start To Left Goal");
+	driveController->generatePath({{3_ft, 6_ft, 17_deg}, {2_ft, 2_ft, 0_deg}}, "Left Goal To End");
+	driveController->generatePath({{3_ft, 6_ft, 17_deg}, {6_ft, 6_ft, 90_deg}}, "Left Goal To Middle Goal");
+	driveController->generatePath({{6_ft, 6_ft, 90_deg}, {2_ft, 2_ft, 0_deg}}, "Middle Goal To Home");
+
+	driveController->setTarget("Start To Left Goal");
+	pros::delay(970);
+	piston(frontClamp, true, true);
+	driveController->waitUntilSettled();
+	if(frontBumper.isPressed()) {
+		driveController->setTarget("Left Goal To End", true);
+		driveController->waitUntilSettled();
+	}
+	else {
+		driveController->setTarget("Left Goal To Middle Goal");
+		piston(frontClamp, true, false);
+		pros::delay(970);
+		piston(frontClamp, true, true);
+		driveController->waitUntilSettled();
+		if(frontBumper.isPressed()) {
+			driveController->setTarget("Middle Goal To Home", true);
+			driveController->waitUntilSettled();
+		}
+	}
+	/*
 	drive->setState({2_ft, 2_ft, 17_deg});
 	drive->driveToPoint({3_ft, 6_ft});
 	piston(frontClamp, true, true);
@@ -188,10 +206,48 @@ void left_middle() {
 		drive->driveToPoint({1.5_ft, 2_ft}, true);
 		drive->turnToAngle(0_deg);
 	}
+	*/
 }
 
 
 void right_middle() {
+	driveController->generatePath({{9_ft, 2_ft, 0_deg}, {9_ft, 6_ft, 0_deg}}, "Start To Right Goal");
+	driveController->generatePath({{9_ft, 6_ft, 0_deg}, {9_ft, 2_ft, 0_deg}}, "Right Goal To End");
+	driveController->generatePath({{9_ft, 6_ft, 0_deg}, {6_ft, 6_ft, -90_deg}}, "Right Goal To Middle Goal");
+	driveController->generatePath({{6_ft, 6_ft, -90_deg}, {11_ft, 3_ft, -45_deg}}, "Middle Goal To Mogo");
+	driveController->generatePath({{11_ft, 3_ft, -45_deg}, {10_ft, 4_ft, 0_deg}, {10_ft, 6_ft, 0_deg}}, "Get Rings");
+	driveController->generatePath({{10_ft, 6_ft, 0_deg}, {10_ft, 2_ft, 0_deg}}, "End");
+
+
+	driveController->setTarget("Start To Right Goal");
+	pros::delay(970);
+	piston(frontClamp, true, true);
+	driveController->waitUntilSettled();
+	if(frontBumper.isPressed()) {
+		driveController->setTarget("Right Goal To End", true);
+		driveController->waitUntilSettled();
+	}
+	else {
+		driveController->setTarget("Right Goal To Middle Goal");
+		piston(frontClamp, true, false);
+		pros::delay(970);
+		piston(frontClamp, true, true);
+		driveController->waitUntilSettled();
+		if(frontBumper.isPressed()) {
+			driveController->setTarget("Middle Goal To Mogo", true);
+			driveController->waitUntilSettled();
+
+			piston(tilt, true, true);
+			pros::delay(250);
+			piston(backClamp, true, false);
+
+			driveController->setTarget("Get Rings");
+			driveController->waitUntilSettled();
+			driveController->setTarget("End");
+			driveController->waitUntilSettled();
+		}
+	}
+	/*
 	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({9_ft, 6_ft});
 	piston(frontClamp, true, true);
@@ -217,6 +273,7 @@ void right_middle() {
 			drive->driveToPoint({10_ft, 2_ft}, true);
 		}
 	}
+	*/
 }
 
 
