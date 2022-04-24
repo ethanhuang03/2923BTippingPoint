@@ -21,7 +21,7 @@ Motor lift(-7);
 MotorGroup RightDrive({frontRightDrive, backRightDrive, topRightDrive});
 MotorGroup LeftDrive({frontLeftDrive, backLeftDrive, topLeftDrive});
 
-RotationSensor leftRotationSensor(13);
+RotationSensor leftRotationSensor(14);
 RotationSensor rightRotationSensor(12, true);
 RotationSensor centerRotationSensor(11);
 //IMU interialSensor(11);
@@ -31,8 +31,7 @@ ADIButton frontBumper('H');
 pros::ADIDigitalOut backClamp('A');
 pros::ADIDigitalOut tilt('B');
 pros::ADIDigitalOut frontClamp('D');
-pros::ADIDigitalOut flap('C');
-pros::ADIDigitalOut swiper('E');
+pros::ADIDigitalOut swiper('C');
 
 bool intake_toggle = false;
 int intakeDirection = 0;
@@ -60,7 +59,6 @@ void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
 
 void initialize() {
 	selector::init();
-	
 	drive = ChassisControllerBuilder()
 		.withLogger(
 			std::make_shared<Logger>(
@@ -80,8 +78,8 @@ void initialize() {
 			rightRotationSensor,
 			centerRotationSensor
 		)
-		.withDimensions({AbstractMotor::gearset::blue, (60.0 / 36.0)}, {{3.25_in, 37.8_cm}, imev5BlueTPR})
-    	.withOdometry({{2.85_in, 22.3_cm, 3.25_in, 2.85_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.75_in, 8.5_in, 3.5_in, 2.75_in |||||| 2.85_in, 22.65_cm, 3.5_in, 2.85_in
+		.withDimensions({AbstractMotor::gearset::blue}, {{2.85_in, 22.3_cm, 3.25_in, 2.85_in}, quadEncoderTPR}) // {{3.25_in, 37.8_cm}, imev5BlueTPR})
+    	.withOdometry(StateMode::CARTESIAN)//{{2.85_in, 22.3_cm, 3.25_in, 2.85_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.75_in, 8.5_in, 3.5_in, 2.75_in |||||| 2.85_in, 22.65_cm, 3.5_in, 2.85_in
 		.buildOdometry();
 
 	driveController = AsyncMotionProfileControllerBuilder()
@@ -155,7 +153,7 @@ void skills() {}
 
 
 void left() {
-	drive->setState({1.5_ft, 2_ft, 0_deg});
+	drive->setState({2_ft, 2_ft, 17_deg});
 	drive->driveToPoint({3_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
@@ -165,14 +163,10 @@ void left() {
 
 
 void right() {
-	/*
-	drive->setState({0_ft, 0_ft, 0_deg});
-	//drive->driveToPoint({0_ft, 6_ft});
-	drive->turnToAngle(720_deg);
-	*/
 	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({9_ft, 6_ft});
 	piston(frontClamp, true, true);
+	pros::delay(2000);
 	if (frontBumper.isPressed()) {
 		drive->driveToPoint({9_ft, 2_ft}, true);
 	}
@@ -180,7 +174,7 @@ void right() {
 
 
 void left_middle() {
-	drive->setState({1.5_ft, 2_ft, 0_deg});
+	drive->setState({2_ft, 2_ft, 17_deg});
 	drive->driveToPoint({3_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
@@ -206,27 +200,28 @@ void right_middle() {
 	}
 	else {
 		piston(frontClamp, true, false);
-		drive->driveToPoint({9_ft, 4_ft}, true);
-		drive->driveToPoint({6_ft, 6_ft});
+		drive->driveToPoint({6.8_ft, 6.5_ft});
 		piston(frontClamp, true, true);
-		drive->driveToPoint({11_ft, 3_ft}, true);
+		if (frontBumper.isPressed()) {
+			drive->driveToPoint({9_ft, 3_ft}, true);
 
-		piston(tilt, true, true);
-		pros::delay(250);
-		piston(backClamp, true, false);
-		
-		drive->driveToPoint({10_ft, 4_ft});
-		drive->turnToAngle(0_deg);
-		asyncLift->setTarget(50);
-		intake.moveVelocity(600);
-		drive->driveToPoint({10_ft, 6_ft});
-		drive->driveToPoint({10_ft, 2_ft}, true);
+			piston(tilt, true, true);
+			pros::delay(250);
+			piston(backClamp, true, false);
+			
+			drive->driveToPoint({10_ft, 4_ft});
+			drive->turnToAngle(0_deg);
+			asyncLift->setTarget(500);
+			intake.moveVelocity(600);
+			drive->driveToPoint({10_ft, 6_ft});
+			drive->driveToPoint({10_ft, 2_ft}, true);
+		}
 	}
 }
 
 
 void middle_left() {
-	drive->setState({1.5_ft, 2_ft, 0_deg});
+	drive->setState({2_ft, 2_ft, 0_deg});
 	drive->driveToPoint({6_ft, 6_ft});
 	piston(frontClamp, true, true);
 	if (frontBumper.isPressed()) {
@@ -278,11 +273,11 @@ void swiper_left() {
 
 
 void swiper_right() {
-	drive->setState({9_ft, 2_ft, 0_deg});
 	piston(swiper, false, true);
+	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({9_ft, 5_ft});
-	drive->turnToAngle(-90_deg);
-	drive->driveToPoint({8_ft, 5_ft});
+	drive->turnToAngle(-120_deg);
+	drive->driveToPoint({4.5_ft, 5_ft});
 	piston(frontClamp, true, true);
 	if(frontBumper.isPressed()) {
 		drive->driveToPoint({9_ft, 2_ft}, true);
@@ -415,19 +410,6 @@ void opcontrol() {
 			else {
 				swiperToggle = true;
 				piston(swiper, false, false);
-				pros::delay(200);
-			}
-		}
-		// flap
-		if(driver.getDigital(ControllerDigital::B) || partner.getDigital(ControllerDigital::B)) {
-			if (flapToggle) {
-				flapToggle = false;
-				piston(flap, false, true);
-				pros::delay(200);
-			}
-			else {
-				flapToggle = true;
-				piston(flap, false, false);
 				pros::delay(200);
 			}
 		}
