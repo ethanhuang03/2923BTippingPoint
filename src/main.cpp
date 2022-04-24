@@ -69,7 +69,7 @@ void initialize() {
 		)
 		.withMotors(LeftDrive, RightDrive)
 		.withGains(
-			{0.0011, 0.0001, 0.000001}, // Distance controller gains p=0.0015   --> 0.0018, 0.001, 0.00006, period = 0.8679818181818181818181818181818
+			{0.00111, 0.0001, 0.000001}, // Distance controller gains p=0.0015   --> 0.0018, 0.001, 0.00006, period = 0.8679818181818181818181818181818
 			{0.0024, 0.0007, 0.00002}, // Turn controller 0.00215, 0.0003, 0.00001}
 			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
