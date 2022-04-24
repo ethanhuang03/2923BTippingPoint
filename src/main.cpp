@@ -155,19 +155,7 @@ void skills() {}
 void left() {}
 
 
-void right() {
-	drive->setState({0_ft, 0_ft, 0_deg});
-	drive->turnToAngle(45_deg);
-	/*
-	drive->setState({9_ft, 2_ft, 0_deg});
-	drive->driveToPoint({9_ft, 6_ft});
-	piston(frontClamp, true, true);
-	pros::delay(2000);
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({9_ft, 2_ft}, true);
-	}
-	*/
-}
+void right() {}
 
 
 void left_middle() {
@@ -247,7 +235,7 @@ void right_middle() {
 
 			driveController->setTarget("Get Rings");
 			driveController->waitUntilSettled();
-			driveController->setTarget("End");
+			driveController->setTarget("End", true);
 			driveController->waitUntilSettled();
 		}
 	}
@@ -282,6 +270,31 @@ void right_middle() {
 
 
 void middle_left() {
+	driveController->generatePath({{2_ft, 2_ft, 45_deg}, {6_ft, 6_ft, 45_deg}}, "Start To Middle Goal");
+	driveController->generatePath({{6_ft, 6_ft, 45_deg}, {2_ft, 2_ft, 45_deg}}, "Middle Goal To End");
+	driveController->generatePath({{6_ft, 6_ft, 45_deg}, {3_ft, 6_ft, -45_deg}}, "Middle Goal To Left Goal");
+	driveController->generatePath({{3_ft, 6_ft, -45_deg}, {2_ft, 2_ft, 0_deg}}, "Left Goal To Home");
+
+	driveController->setTarget("Start To Middle Goal");
+	pros::delay(1000);
+	piston(frontClamp, true, true);
+	driveController->waitUntilSettled();
+	if(frontBumper.isPressed()) {
+		driveController->setTarget("Middle Goal To End", true);
+		driveController->waitUntilSettled();
+	}
+	else {
+		driveController->setTarget("Middle Goal To Left Goal");
+		piston(frontClamp, true, false);
+		pros::delay(970);
+		piston(frontClamp, true, true);
+		driveController->waitUntilSettled();
+		if(frontBumper.isPressed()) {
+			driveController->setTarget("Left Goal To Home", true);
+			driveController->waitUntilSettled();
+		}
+	}
+	/*
 	drive->setState({2_ft, 2_ft, 0_deg});
 	drive->driveToPoint({6_ft, 6_ft});
 	piston(frontClamp, true, true);
@@ -297,10 +310,48 @@ void middle_left() {
 			drive->driveToPoint({1.5_ft, 2_ft}, true);
 		}
 	}
+	*/
 }
 
 
 void middle_right() {
+	driveController->generatePath({{9_ft, 2_ft, -45_deg}, {6_ft, 6_ft, -45_deg}}, "Start To Middle Goal");
+	driveController->generatePath({{6_ft, 6_ft, -45_deg}, {9_ft, 2_ft, -45_deg}}, "Middle Goal To End");
+	driveController->generatePath({{6_ft, 6_ft, -45_deg}, {9_ft, 6_ft, 45_deg}}, "Middle Goal To Right Goal");
+	driveController->generatePath({{9_ft, 6_ft, 45_deg}, {11_ft, 3_ft, -45_deg}}, "Right Goal to Mogo");
+	driveController->generatePath({{11_ft, 3_ft, -45_deg}, {10_ft, 4_ft, 0_deg}, {10_ft, 6_ft, 0_deg}}, "Get Rings");
+	driveController->generatePath({{10_ft, 6_ft, 0_deg}, {10_ft, 2_ft, 0_deg}}, "End");
+
+	driveController->setTarget("Start To Middle Goal");
+	pros::delay(1000);
+	piston(frontClamp, true, true);
+	driveController->waitUntilSettled();
+	if(frontBumper.isPressed()) {
+		driveController->setTarget("Middle Goal To End", true);
+		driveController->waitUntilSettled();
+	}
+	else {
+		driveController->setTarget("Middle Goal To Right Goal");
+		piston(frontClamp, true, false);
+		pros::delay(970);
+		piston(frontClamp, true, true);
+		driveController->waitUntilSettled();
+		if(frontBumper.isPressed()) {
+			driveController->setTarget("Right Goal To Mogo", true);
+			driveController->waitUntilSettled();
+
+			piston(tilt, true, true);
+			pros::delay(250);
+			piston(backClamp, true, false);
+
+			driveController->setTarget("Get Rings");
+			driveController->waitUntilSettled();
+			driveController->setTarget("End", true);
+			driveController->waitUntilSettled();
+		}
+	}
+
+	/*
 	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({6_ft, 6_ft});
 	piston(frontClamp, true, true);
@@ -316,10 +367,19 @@ void middle_right() {
 			drive->driveToPoint({9_ft, 2_ft}, true);
 		}
 	}
+	*/
 }
 
 
 void swiper_left() {
+	driveController->generatePath({{2_ft, 1.9_ft, 0_deg}, {2_ft, 4.666666666_ft, 0_deg}, {4.2_ft, 5.7_ft, 90_deg}}, "Swiping Motion");
+	driveController->generatePath({}, "Return Home");
+
+	piston(swiper, false, true);
+	driveController->setTarget("Swiping Motion");
+	driveController->waitUntilSettled();
+	piston(swiper, false, false);
+	/*
 	drive->setState({1.5_ft, 2_ft, 0_deg});
 	piston(swiper, false, true);
 	drive->driveToPoint({3_ft, 5_ft});
@@ -330,10 +390,26 @@ void swiper_left() {
 		drive->driveToPoint({1.5_ft, 2_ft}, true);
 	}
 	piston(swiper, false, false);
+	*/
 }
 
 
 void swiper_right() {
+	driveController->generatePath({{9_ft, 2_ft, 0_deg}, {9_ft, 4.666666666_ft, 0_deg}, {8_ft, 5_ft, -90_deg}, {6.5_ft, 5_ft, -90_deg}}, "Swiping Motion");
+	driveController->generatePath({{6.5_ft, 5_ft, -90_deg}, {9_ft, 2_ft, 0_deg}}, "Return Home");
+
+	piston(swiper, false, true);
+	driveController->setTarget("Swiping Motion");
+	pros::delay(2000);
+	piston(frontClamp, true, true);
+	driveController->waitUntilSettled();
+	if(frontBumper.isPressed()) {
+		driveController->setTarget("Return Home", true);
+		driveController->waitUntilSettled();
+	}
+	piston(swiper, false, false);
+
+	/*
 	piston(swiper, false, true);
 	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({9_ft, 5_ft});
@@ -344,6 +420,7 @@ void swiper_right() {
 		drive->driveToPoint({9_ft, 2_ft}, true);
 	}
 	piston(swiper, false, false);
+	*/
 }
 
 
@@ -351,52 +428,40 @@ void autonomous() {
 	piston(backClamp, true, false);
 	piston(frontClamp, true, false);
 	
-	if(selector::auton == 1) { // Red Left
-		left();
-	}
-	else if(selector::auton == 2) { // Red Left and Middle
+	if(selector::auton == 1) { // Red Left and Middle
 		left_middle();
 	}
-	else if(selector::auton == 3){ // Red Right
-		right();
-	}
-	else if(selector::auton == 4) { // Red Right and Middle
+	else if(selector::auton == 2) { // Red Right and Middle
 		right_middle();
 	}
-	else if(selector::auton == 5) { // Red Middle (From Left)
+	else if(selector::auton == 3) { // Red Middle (From Left)
 		middle_left();
 	}
-	else if(selector::auton == 6) { // Red Middle (From Right)
+	else if(selector::auton == 4) { // Red Middle (From Right)
 		middle_right();
 	}
-	else if(selector::auton == 7) { // swiper (Left)
+	else if(selector::auton == 5) { // swiper (Left)
 		swiper_left();
 	}
-	else if(selector::auton == 8) { // swiper (Right)
+	else if(selector::auton == 6) { // swiper (Right)
 		swiper_right();
 	}
-	else if(selector::auton == -1) { // Blue Left
-		left();
-	}
-	else if(selector::auton == -2) { // Blue Left and Middle
+	else if(selector::auton == -1) { // Blue Left and Middle
 		left_middle();
 	}
-	else if(selector::auton == -3){ // Blue Right
-		right();
-	}
-	else if(selector::auton == -4) { // Blue Right and Middle
+	else if(selector::auton == -2) { // Blue Right and Middle
 		right_middle();
 	}
-	else if(selector::auton == -5) { // Blue Middle (From Left)
+	else if(selector::auton == -3) { // Blue Middle (From Left)
 		middle_left();
 	}
-	else if(selector::auton == -6) { // Blue Middle (From Right)
+	else if(selector::auton == -4) { // Blue Middle (From Right)
 		middle_right();
 	}
-	else if(selector::auton == -7) { // swiper (Left)
+	else if(selector::auton == -5) { // swiper (Left)
 		swiper_left();
 	}
-	else if(selector::auton == -8) { // swiper (Right)
+	else if(selector::auton == -6) { // swiper (Right)
 		swiper_right();
 	}
 	else if(selector::auton == 0){ //Skills

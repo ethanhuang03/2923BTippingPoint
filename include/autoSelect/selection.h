@@ -4,8 +4,8 @@
 
 //selector configuration
 #define HUE 360
-#define DEFAULT 3
-#define AUTONS "L", "LM", "R", "RM", "ML", "MR", "SL", "SR"
+#define DEFAULT 2
+#define AUTONS "LM", "RM", "ML", "MR", "SL", "SR"
 
 namespace selector{
 
