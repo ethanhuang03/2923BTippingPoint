@@ -69,7 +69,7 @@ void initialize() {
 		)
 		.withMotors(LeftDrive, RightDrive)
 		.withGains(
-			{0.00111, 0.0001, 0.000001}, // Distance controller gains p=0.0015   --> 0.0018, 0.001, 0.00006, period = 0.8679818181818181818181818181818
+			{0.0012, 0.00003, 0.000003}, // Distance controller gains p=0.0015   --> 0.0018, 0.001, 0.00006, period = 0.8679818181818181818181818181818
 			{0.0024, 0.0007, 0.00002}, // Turn controller 0.00215, 0.0003, 0.00001}
 			{0, 0, 0}  // Angle controller gains (helps drive straight)
 		)
@@ -78,7 +78,7 @@ void initialize() {
 			rightRotationSensor,
 			centerRotationSensor
 		)
-		.withDimensions({AbstractMotor::gearset::blue}, {{2.85_in, 22.3_cm, 3.25_in, 2.85_in}, quadEncoderTPR}) // {{3.25_in, 37.8_cm}, imev5BlueTPR})
+		.withDimensions({AbstractMotor::gearset::blue}, {{2.83_in, 22.1_cm, 3.25_in, 2.85_in}, quadEncoderTPR}) // {{3.25_in, 37.8_cm}, imev5BlueTPR})
     	.withOdometry(StateMode::CARTESIAN)//{{2.85_in, 22.3_cm, 3.25_in, 2.85_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.75_in, 8.5_in, 3.5_in, 2.75_in |||||| 2.85_in, 22.65_cm, 3.5_in, 2.85_in
 		.buildOdometry();
 
@@ -163,6 +163,9 @@ void left() {
 
 
 void right() {
+	drive->setState({0_ft, 0_ft, 0_deg});
+	drive->turnToAngle(45_deg);
+	/*
 	drive->setState({9_ft, 2_ft, 0_deg});
 	drive->driveToPoint({9_ft, 6_ft});
 	piston(frontClamp, true, true);
@@ -170,6 +173,7 @@ void right() {
 	if (frontBumper.isPressed()) {
 		drive->driveToPoint({9_ft, 2_ft}, true);
 	}
+	*/
 }
 
 
