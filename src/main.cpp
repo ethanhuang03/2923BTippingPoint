@@ -50,6 +50,34 @@ void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
 }
 
 
+void right_auton_piston() {
+	piston(frontClamp, true, false);
+	pros::delay(890);
+    piston(frontClamp, true, true);
+}
+
+
+void left_auton_piston() {
+	piston(frontClamp, true, false);
+	pros::delay(890);
+	piston(frontClamp, true, true);
+}
+
+
+void middle_left_auton_piston() {
+	piston(frontClamp, true, false);
+	pros::delay(1190);
+	piston(frontClamp, true, true);
+}
+
+
+void middle_right_auton_piston() {
+	piston(frontClamp, true, false);
+	pros::delay(1005);
+	piston(frontClamp, true, true);
+}
+
+
 void initialize() {
 	selector::init();
 	drive = ChassisControllerBuilder()
@@ -117,7 +145,6 @@ void tank_drive(Controller controller) {
 	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
 }
 
-
 void whole_drive(int velocity) {
 	backRightDrive.moveVelocity(velocity);
 	frontRightDrive.moveVelocity(velocity);
@@ -140,11 +167,11 @@ void right_drive(int velocity) {
 }
 
 void left() {
+	pros::Task activate_pistons(left_auton_piston);
 	whole_drive(600);
-	pros::delay(700);
-	piston(frontClamp, true, true);
+	pros::delay(800);
 	whole_drive(-600);
-	pros::delay(50);
+	pros::delay(300);
 	if (frontBumper.isPressed()) {
 		while (topRightDrive.getActualVelocity() > -500) {
 			pros::delay(10);
@@ -161,11 +188,11 @@ void left() {
 
 
 void right() {
+	pros::Task activate_pistons(right_auton_piston);
 	whole_drive(600);
-	pros::delay(700);
-	piston(frontClamp, true, true);
+	pros::delay(800);
 	whole_drive(-600);
-	pros::delay(50);
+	pros::delay(300);
 	if (frontBumper.isPressed()) {
 		while (topRightDrive.getActualVelocity() > -500) {
 			pros::delay(10);
@@ -181,11 +208,11 @@ void right() {
 }
 
 void left_middle() {
+	pros::Task activate_pistons(middle_left_auton_piston);
 	whole_drive(600);
-	pros::delay(700);
-	piston(frontClamp, true, true);
+	pros::delay(1100);
 	whole_drive(-600);
-	pros::delay(50);
+	pros::delay(300);
 	if (frontBumper.isPressed()) {
 		while (topRightDrive.getActualVelocity() > -500) {
 			pros::delay(10);
@@ -201,11 +228,11 @@ void left_middle() {
 }
 
 void right_middle() {
+	pros::Task activate_pistons(middle_right_auton_piston);
 	whole_drive(600);
-	pros::delay(700);
-	piston(frontClamp, true, true);
+	pros::delay(915);
 	whole_drive(-600);
-	pros::delay(50);
+	pros::delay(300);
 	if (frontBumper.isPressed()) {
 		while (topRightDrive.getActualVelocity() > -500) {
 			pros::delay(10);
@@ -246,9 +273,9 @@ void swiper_right() {
 		piston(frontClamp, true, true);
 		right_drive(-600);
 		left_drive(600);
-		pros::delay(600);
+		pros::delay(80);
 		whole_drive(-600);
-		pros::delay(500);
+		pros::delay(700);
 		whole_drive(0);
 		piston(swiper, false, false);
 	}
