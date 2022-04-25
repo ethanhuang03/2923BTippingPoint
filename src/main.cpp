@@ -146,7 +146,10 @@ void left() {
 	whole_drive(-600);
 	pros::delay(50);
 	if (frontBumper.isPressed()) {
-		pros::delay(400);
+		while (topRightDrive.getActualVelocity() > -500) {
+			pros::delay(10);
+		}
+		pros::delay(200);
 		whole_drive(0);
 	}
 	else {
@@ -164,7 +167,10 @@ void right() {
 	whole_drive(-600);
 	pros::delay(50);
 	if (frontBumper.isPressed()) {
-		pros::delay(400);
+		while (topRightDrive.getActualVelocity() > -500) {
+			pros::delay(10);
+		}
+		pros::delay(200);
 		whole_drive(0);
 	}
 	else {
@@ -181,7 +187,10 @@ void left_middle() {
 	whole_drive(-600);
 	pros::delay(50);
 	if (frontBumper.isPressed()) {
-		pros::delay(400);
+		while (topRightDrive.getActualVelocity() > -500) {
+			pros::delay(10);
+		}
+		pros::delay(200);
 		whole_drive(0);
 	}
 	else {
@@ -198,7 +207,10 @@ void right_middle() {
 	whole_drive(-600);
 	pros::delay(50);
 	if (frontBumper.isPressed()) {
-		pros::delay(400);
+		while (topRightDrive.getActualVelocity() > -500) {
+			pros::delay(10);
+		}
+		pros::delay(200);
 		whole_drive(0);
 	}
 	else {
@@ -222,16 +234,29 @@ void swiper_left() {
 void swiper_right() {
 	piston(swiper, false, true);
 	whole_drive(600);
-	pros::delay(600);
+	pros::delay(500);
 	left_drive(-400);
 	pros::delay(600);
+	piston(frontClamp, true, false);
+	whole_drive(400);
+	pros::delay(300);
 	whole_drive(0);
+	pros::delay(500);
+	if (frontBumper.isPressed()) {
+		piston(frontClamp, true, true);
+		right_drive(-600);
+		left_drive(600);
+		pros::delay(600);
+		whole_drive(-600);
+		pros::delay(500);
+		whole_drive(0);
+		piston(swiper, false, false);
+	}
 }
 
 
 void autonomous() {
 	piston(backClamp, true, false);
-	piston(frontClamp, true, false);
 	
 	if(selector::auton == 1) { // Red Left
 		left();
@@ -298,12 +323,12 @@ void opcontrol() {
 		if(driver.getDigital(ControllerDigital::Y) || partner.getDigital(ControllerDigital::Y)) {
 			if (frontClampToggle) {
 				frontClampToggle = false;
-				piston(frontClamp, true, false);
+				piston(frontClamp, true, true);
 				pros::delay(200);
 			}
 			else {
 				frontClampToggle = true;
-				piston(frontClamp, true, true);
+				piston(frontClamp, true, false);
 				pros::delay(200);
 			}
 		}
