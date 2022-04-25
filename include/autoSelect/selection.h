@@ -3,9 +3,9 @@
 #include <string>
 
 //selector configuration
-#define HUE 360
-#define DEFAULT 2
-#define AUTONS "LM", "RM", "ML", "MR", "SL", "SR"
+#define HUE 36
+#define DEFAULT 1
+#define AUTONS "L", "R", "LM", "RM", "SL", "SR"
 
 namespace selector{
 

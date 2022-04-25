@@ -5,9 +5,7 @@ Controller master(ControllerId::master);
 Controller partner(ControllerId::partner);
 Controller driver = master;
 
-std::shared_ptr<OdomChassisController> drive;
-std::shared_ptr<AsyncMotionProfileController> driveController;
-std::shared_ptr<AsyncPositionController<double, double>> asyncLift;
+std::shared_ptr<ChassisController> drive;
 
 Motor backRightDrive(4);
 Motor frontRightDrive(5);
@@ -20,11 +18,6 @@ Motor lift(-7);
 
 MotorGroup RightDrive({frontRightDrive, backRightDrive, topRightDrive});
 MotorGroup LeftDrive({frontLeftDrive, backLeftDrive, topLeftDrive});
-
-RotationSensor leftRotationSensor(14);
-RotationSensor rightRotationSensor(12, true);
-RotationSensor centerRotationSensor(11);
-//IMU interialSensor(11);
 
 ADIButton frontBumper('H');
 
@@ -68,32 +61,8 @@ void initialize() {
 			)
 		)
 		.withMotors(LeftDrive, RightDrive)
-		.withGains(
-			{0.0012, 0.00003, 0.000003}, // Distance controller gains p=0.0015   --> 0.0018, 0.001, 0.00006, period = 0.8679818181818181818181818181818
-			{0.0024, 0.0007, 0.00002}, // Turn controller 0.00215, 0.0003, 0.00001}
-			{0, 0, 0}  // Angle controller gains (helps drive straight)
-		)
-		.withSensors(
-			leftRotationSensor,
-			rightRotationSensor,
-			centerRotationSensor
-		)
-		.withDimensions({AbstractMotor::gearset::blue}, {{2.83_in, 22.1_cm, 3.25_in, 2.85_in}, quadEncoderTPR}) // {{3.25_in, 37.8_cm}, imev5BlueTPR})
-    	.withOdometry(StateMode::CARTESIAN)//{{2.85_in, 22.3_cm, 3.25_in, 2.85_in}, quadEncoderTPR}, StateMode::CARTESIAN) //2.75_in, 8.5_in, 3.5_in, 2.75_in |||||| 2.85_in, 22.65_cm, 3.5_in, 2.85_in
-		.buildOdometry();
-
-	driveController = AsyncMotionProfileControllerBuilder()
-		.withLimits({
-			1.8, // Maximum linear velocity of the Chassis in m/s
-			5.0, // Maximum linear acceleration of the Chassis in m/s/s
-			10.0 // Maximum linear jerk of the Chassis in m/s/s/s
-		})
-		.withOutput(drive)
-		.buildMotionProfileController();
-
-	asyncLift = AsyncPosControllerBuilder()
-    	.withMotor(8) // lift motor port 8
-    	.build();
+		.withDimensions({AbstractMotor::gearset::blue, (60/36)}, {{3.25_in, 37.8_cm}, imev5BlueTPR})
+		.build();
 
 	lift.setBrakeMode(AbstractMotor::brakeMode::hold);
 }
@@ -149,134 +118,114 @@ void tank_drive(Controller controller) {
 }
 
 
-void skills() {}
+void whole_drive(int velocity) {
+	backRightDrive.moveVelocity(velocity);
+	frontRightDrive.moveVelocity(velocity);
+	topRightDrive.moveVelocity(velocity);
+	backLeftDrive.moveVelocity(velocity);
+	frontLeftDrive.moveVelocity(velocity);
+	topLeftDrive.moveVelocity(velocity);
+}
+
+void left_drive(int velocity) {
+	backLeftDrive.moveVelocity(velocity);
+	frontLeftDrive.moveVelocity(velocity);
+	topLeftDrive.moveVelocity(velocity);
+}
+
+void right_drive(int velocity) {
+	backRightDrive.moveVelocity(velocity);
+	frontRightDrive.moveVelocity(velocity);
+	topRightDrive.moveVelocity(velocity);
+}
+
+void left() {
+	whole_drive(600);
+	pros::delay(700);
+	piston(frontClamp, true, true);
+	whole_drive(-600);
+	pros::delay(50);
+	if (frontBumper.isPressed()) {
+		pros::delay(400);
+		whole_drive(0);
+	}
+	else {
+		whole_drive(600);
+		pros::delay(50);
+		whole_drive(0);
+	}
+}
 
 
-void left() {}
-
-
-void right() {}
-
+void right() {
+	whole_drive(600);
+	pros::delay(700);
+	piston(frontClamp, true, true);
+	whole_drive(-600);
+	pros::delay(50);
+	if (frontBumper.isPressed()) {
+		pros::delay(400);
+		whole_drive(0);
+	}
+	else {
+		whole_drive(600);
+		pros::delay(50);
+		whole_drive(0);
+	}
+}
 
 void left_middle() {
-	drive->setState({2_ft, 2_ft, 17_deg});
-	drive->driveToPoint({3_ft, 6_ft});
+	whole_drive(600);
+	pros::delay(700);
 	piston(frontClamp, true, true);
+	whole_drive(-600);
+	pros::delay(50);
 	if (frontBumper.isPressed()) {
-		drive->driveToPoint({1.5_ft, 2_ft}, true);
+		pros::delay(400);
+		whole_drive(0);
 	}
 	else {
-		piston(frontClamp, true, false);
-		drive->driveToPoint({3_ft, 4_ft}, true);
-		drive->driveToPoint({6_ft, 6_ft});
-		piston(frontClamp, true, true);
-		drive->driveToPoint({1.5_ft, 2_ft}, true);
-		drive->turnToAngle(0_deg);
+		whole_drive(600);
+		pros::delay(50);
+		whole_drive(0);
 	}
 }
-
 
 void right_middle() {
-	drive->setState({9_ft, 2_ft, 0_deg});
-	drive->driveToPoint({9_ft, 6_ft});
+	whole_drive(600);
+	pros::delay(700);
 	piston(frontClamp, true, true);
+	whole_drive(-600);
+	pros::delay(50);
 	if (frontBumper.isPressed()) {
-		drive->driveToPoint({9_ft, 2_ft}, true);
+		pros::delay(400);
+		whole_drive(0);
 	}
 	else {
-		piston(frontClamp, true, false);
-		drive->driveToPoint({6.8_ft, 6.5_ft});
-		piston(frontClamp, true, true);
-		if (frontBumper.isPressed()) {
-			drive->driveToPoint({9_ft, 3_ft}, true);
-
-			piston(tilt, true, true);
-			pros::delay(250);
-			piston(backClamp, true, false);
-			
-			drive->driveToPoint({10_ft, 4_ft});
-			drive->turnToAngle(0_deg);
-			asyncLift->setTarget(500);
-			intake.moveVelocity(600);
-			drive->driveToPoint({10_ft, 6_ft});
-			drive->driveToPoint({10_ft, 2_ft}, true);
-		}
-	}
-}
-
-
-void middle_left() {
-	drive->setState({2_ft, 2_ft, 0_deg});
-	drive->driveToPoint({6_ft, 6_ft});
-	piston(frontClamp, true, true);
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({1.5_ft, 2_ft}, true);
-	}
-	else {
-		piston(frontClamp, true, false);
-		drive->driveToPoint({4_ft, 4_ft}, true);
-		drive->driveToPoint({3_ft, 6_ft});
-		piston(frontClamp, true, true);
-		if (frontBumper.isPressed()) {
-			drive->driveToPoint({1.5_ft, 2_ft}, true);
-		}
-	}
-}
-
-
-void middle_right() {
-	drive->setState({9_ft, 2_ft, 0_deg});
-	drive->driveToPoint({6_ft, 6_ft});
-	piston(frontClamp, true, true);
-	if (frontBumper.isPressed()) {
-		drive->driveToPoint({9_ft, 2_ft}, true);
-	}
-	else {
-		piston(frontClamp, true, false);
-		drive->driveToPoint({8_ft, 4_ft}, true);
-		drive->driveToPoint({9_ft, 6_ft});
-		piston(frontClamp, true, true);
-		if(frontBumper.isPressed()) {
-			drive->driveToPoint({9_ft, 2_ft}, true);
-		}
+		whole_drive(600);
+		pros::delay(50);
+		whole_drive(0);
 	}
 }
 
 
 void swiper_left() {
-	drive->setState({1.5_ft, 2_ft, 0_deg});
 	piston(swiper, false, true);
-	drive->driveToPoint({3_ft, 5_ft});
-	drive->turnToAngle(90_deg);
-	drive->driveToPoint({4_ft, 5_ft});
-	piston(frontClamp, true, true);
-	if(frontBumper.isPressed()) {
-		drive->driveToPoint({1.5_ft, 2_ft}, true);
-	}
-	piston(swiper, false, false);
+	whole_drive(600);
+	pros::delay(700);
+	right_drive(-400);
+	pros::delay(600);
+	whole_drive(0);
 }
 
 
 void swiper_right() {
-
-	backRightDrive.moveVelocity;
-	frontRightDrive(5);
-	topRightDrive(6);
-	backLeftDrive(-1);
-	frontLeftDrive(-2);
-	topLeftDrive(-3);
-	/*
 	piston(swiper, false, true);
-	drive->setState({9_ft, 2_ft, 0_deg});
-	drive->driveToPoint({9_ft, 5_ft});
-	drive->turnToAngle(-120_deg);
-	drive->driveToPoint({4.5_ft, 5_ft});
-	piston(frontClamp, true, true);
-	if(frontBumper.isPressed()) {
-		drive->driveToPoint({9_ft, 2_ft}, true);
-	}
-	piston(swiper, false, false);
-	*/
+	whole_drive(600);
+	pros::delay(600);
+	left_drive(-400);
+	pros::delay(600);
+	whole_drive(0);
 }
 
 
@@ -284,17 +233,17 @@ void autonomous() {
 	piston(backClamp, true, false);
 	piston(frontClamp, true, false);
 	
-	if(selector::auton == 1) { // Red Left and Middle
-		left_middle();
+	if(selector::auton == 1) { // Red Left
+		left();
 	}
-	else if(selector::auton == 2) { // Red Right and Middle
-		right_middle();
+	else if(selector::auton == 2) { // Red Right
+		right();
 	}
 	else if(selector::auton == 3) { // Red Middle (From Left)
-		middle_left();
+		left_middle();
 	}
 	else if(selector::auton == 4) { // Red Middle (From Right)
-		middle_right();
+		right_middle();
 	}
 	else if(selector::auton == 5) { // swiper (Left)
 		swiper_left();
@@ -302,26 +251,23 @@ void autonomous() {
 	else if(selector::auton == 6) { // swiper (Right)
 		swiper_right();
 	}
-	else if(selector::auton == -1) { // Blue Left and Middle
+	else if(selector::auton == 1) { // Blue Left
+		left();
+	}
+	else if(selector::auton == 2) { // Blue Right
+		right();
+	}
+	else if(selector::auton == 3) { // Blue Middle (From Left)
 		left_middle();
 	}
-	else if(selector::auton == -2) { // Blue Right and Middle
+	else if(selector::auton == 4) { // Blue Middle (From Right)
 		right_middle();
-	}
-	else if(selector::auton == -3) { // Blue Middle (From Left)
-		middle_left();
-	}
-	else if(selector::auton == -4) { // Blue Middle (From Right)
-		middle_right();
 	}
 	else if(selector::auton == -5) { // swiper (Left)
 		swiper_left();
 	}
 	else if(selector::auton == -6) { // swiper (Right)
 		swiper_right();
-	}
-	else if(selector::auton == 0){ //Skills
-		skills();
 	}
 }
 
@@ -424,13 +370,6 @@ void opcontrol() {
 
 		}
 
-		// AUTOMATION
-		// intake unjammer
-		/*
-		if(intake.getActualVelocity() < 20 && intake.getTargetVelocity() > 20 && intake_toggle) {
-			intake.moveRelative(-600, 600);
-		}
-		*/
 		pros::delay(10);
 	}
 }
