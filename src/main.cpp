@@ -62,22 +62,6 @@ void auton_swiper(void* delay) {
     piston(swiper, false, false);
 }
 
-void auton_lift() {
-	piston(frontClamp, true, false);
-	lift.moveVelocity(100);
-	pros::delay(100);
-	lift.moveVelocity(0);
-	pros::delay(150);
-	intake.moveVelocity(600);
-	pros::delay(300);
-	intake.moveVelocity(0);
-	lift.moveVelocity(-100);
-	pros::delay(100);
-	lift.moveVelocity(0);
-	pros::delay(200);
-    piston(swiper, false, false);
-}
-
 
 void initialize() {
 	selector::init();
@@ -213,23 +197,12 @@ void right() {
 }
 
 void left_middle() {
-	pros::Task activate_pistons(auton_lift);
+	pros::Task activate_pistons(auton_swiper, (void*)2000);
 	whole_drive(600);
-	pros::delay(1200);
-	whole_drive(-600);
-	pros::delay(300);
-	if (frontBumper.isPressed()) {
-		while (topRightDrive.getActualVelocity() > -500) {
-			pros::delay(10);
-		}
-		pros::delay(200);
-		whole_drive(0);
-	}
-	else {
-		whole_drive(600);
-		pros::delay(50);
-		whole_drive(0);
-	}
+	pros::delay(900);
+	right_drive(-400);
+	pros::delay(500);
+	whole_drive(0);
 }
 
 
