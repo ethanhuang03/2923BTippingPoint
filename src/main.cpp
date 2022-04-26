@@ -130,6 +130,10 @@ void tank_drive(Controller controller) {
 	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
 }
 
+void arcade_drive(Controller controller) {
+	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightX));
+}
+
 void whole_drive(int velocity) {
 	backRightDrive.moveVelocity(velocity);
 	frontRightDrive.moveVelocity(velocity);
@@ -235,12 +239,29 @@ void right_middle() {
 
 
 void swiper_left() {
-	pros::Task activate_pistons(auton_swiper, (void*)5000);
+	pros::Task activate_pistons(auton_swiper, (void*)1200);
 	whole_drive(600);
-	pros::delay(700);
-	right_drive(-400);
 	pros::delay(600);
+	right_drive(-400);
+	pros::delay(400);
+	piston(frontClamp, true, false);
 	whole_drive(0);
+	pros::delay(300);
+	right_drive(-600);
+	pros::delay(100);
+	whole_drive(600);
+	pros::delay(500);
+	whole_drive(0);
+	pros::delay(500);
+	if (frontBumper.isPressed()) {
+		piston(frontClamp, true, true);
+		right_drive(600);
+		left_drive(-600);
+		pros::delay(150);
+		whole_drive(-600);
+		pros::delay(600);
+		whole_drive(0);
+	}
 }
 
 
@@ -317,8 +338,9 @@ void opcontrol() {
 	bool swiperToggle = false;
 	bool swiperHeld = false;
 	bool driverToggle = false;
+	bool brakeToggle = false; 
+	printf("hi");
 	driver = master;
-
 	while(true){
 		tank_drive(driver);
 
@@ -398,12 +420,23 @@ void opcontrol() {
 		else {
 			swiperHeld = false;
 		}
+
 		// auto clamp
-		if(partner.getDigital(ControllerDigital::A) && frontBumper.isPressed() && !frontClampToggle) {
+		if(partner.getDigital(ControllerDigital::left) && frontBumper.isPressed() && !frontClampToggle) {
 				frontClampToggle = true;
 				piston(frontClamp, true, true);
 				pros::delay(200);
 		}
+
+		// lower tilter only
+		if(partner.getDigital(ControllerDigital::up)) {
+			if (backClampToggle) {
+				backClampToggle = false;
+				piston(tilt, true, true);
+				pros::delay(200);
+			}
+		}
+		
 		// override master controller
 		if(partner.getDigital(ControllerDigital::X)) {
 			if (driverToggle) {
@@ -419,12 +452,25 @@ void opcontrol() {
 				pros::delay(200);
 			}
 		}
-		// safety features?
-		if(partner.getDigital(ControllerDigital::up)) {
 
-		}
-		if(partner.getDigital(ControllerDigital::right)) {
-
+		// Hard break
+		if(partner.getDigital(ControllerDigital::A)) {
+			if(brakeToggle) {
+				brakeToggle = false;
+				driver = master;
+				LeftDrive.setBrakeMode(AbstractMotor::brakeMode::coast);
+				RightDrive.setBrakeMode(AbstractMotor::brakeMode::coast);				
+				pros::delay(200);
+			}
+			else {
+				brakeToggle = true;
+				LeftDrive.setBrakeMode(AbstractMotor::brakeMode::hold);
+				RightDrive.setBrakeMode(AbstractMotor::brakeMode::hold);
+				driver = partner;
+				LeftDrive.moveVelocity(0);
+				RightDrive.moveVelocity(0);
+				pros::delay(200);
+			}
 		}
 
 		pros::delay(10);
