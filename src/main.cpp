@@ -50,31 +50,16 @@ void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
 }
 
 
-void right_auton_piston() {
+void auton_front_clamp(void* delay) {
 	piston(frontClamp, true, false);
-	pros::delay(890);
+	pros::delay((int)delay);
     piston(frontClamp, true, true);
 }
 
-
-void left_auton_piston() {
-	piston(frontClamp, true, false);
-	pros::delay(890);
-	piston(frontClamp, true, true);
-}
-
-
-void middle_left_auton_piston() {
-	piston(frontClamp, true, false);
-	pros::delay(1190);
-	piston(frontClamp, true, true);
-}
-
-
-void middle_right_auton_piston() {
-	piston(frontClamp, true, false);
-	pros::delay(1005);
-	piston(frontClamp, true, true);
+void auton_swiper(void* delay) {
+	piston(swiper, false, true);
+	pros::delay((int)delay);
+    piston(swiper, false, false);
 }
 
 
@@ -167,7 +152,7 @@ void right_drive(int velocity) {
 }
 
 void left() {
-	pros::Task activate_pistons(left_auton_piston);
+	pros::Task activate_pistons(auton_front_clamp, (void*)890);
 	whole_drive(600);
 	pros::delay(800);
 	whole_drive(-600);
@@ -188,7 +173,7 @@ void left() {
 
 
 void right() {
-	pros::Task activate_pistons(right_auton_piston);
+	pros::Task activate_pistons(auton_front_clamp, (void*)890);
 	whole_drive(600);
 	pros::delay(800);
 	whole_drive(-600);
@@ -208,7 +193,7 @@ void right() {
 }
 
 void left_middle() {
-	pros::Task activate_pistons(middle_left_auton_piston);
+	pros::Task activate_pistons(auton_front_clamp, (void*)1190);
 	whole_drive(600);
 	pros::delay(1100);
 	whole_drive(-600);
@@ -227,8 +212,9 @@ void left_middle() {
 	}
 }
 
+
 void right_middle() {
-	pros::Task activate_pistons(middle_right_auton_piston);
+	pros::Task activate_pistons(auton_front_clamp, (void*)1005);
 	whole_drive(600);
 	pros::delay(915);
 	whole_drive(-600);
@@ -249,7 +235,7 @@ void right_middle() {
 
 
 void swiper_left() {
-	piston(swiper, false, true);
+	pros::Task activate_pistons(auton_swiper, (void*)5000);
 	whole_drive(600);
 	pros::delay(700);
 	right_drive(-400);
@@ -259,7 +245,7 @@ void swiper_left() {
 
 
 void swiper_right() {
-	piston(swiper, false, true);
+	pros::Task activate_pistons(auton_swiper, (void*)5000);
 	whole_drive(600);
 	pros::delay(500);
 	left_drive(-400);
@@ -277,7 +263,6 @@ void swiper_right() {
 		whole_drive(-600);
 		pros::delay(700);
 		whole_drive(0);
-		piston(swiper, false, false);
 	}
 }
 
@@ -326,9 +311,11 @@ void autonomous() {
 
 void opcontrol() {
 	bool backClampToggle = false;
+	bool backClampHeld = false;
 	bool frontClampToggle = false;
+	bool frontClampHeld = false;
 	bool swiperToggle = false;
-	bool flapToggle = false;
+	bool swiperHeld = false;
 	bool driverToggle = false;
 	driver = master;
 
@@ -348,16 +335,22 @@ void opcontrol() {
 		}
 		// clamp
 		if(driver.getDigital(ControllerDigital::Y) || partner.getDigital(ControllerDigital::Y)) {
-			if (frontClampToggle) {
-				frontClampToggle = false;
-				piston(frontClamp, true, true);
-				pros::delay(200);
+			if (frontClampHeld == false) {
+				frontClampHeld = true;
+				if (frontClampToggle) {
+					frontClampToggle = false;
+					piston(frontClamp, true, false);
+					pros::delay(100);
+				}
+				else {
+					frontClampToggle = true;
+					piston(frontClamp, true, true);
+					pros::delay(100);
+				}
 			}
-			else {
-				frontClampToggle = true;
-				piston(frontClamp, true, false);
-				pros::delay(200);
-			}
+		}
+		else {
+			frontClampHeld = false;
 		}
 		
 		// MOGO stuff
@@ -365,33 +358,45 @@ void opcontrol() {
 		intake_switcher(intake_toggle);
 		// mogo grab and tilt
 		if(driver.getDigital(ControllerDigital::right) || partner.getDigital(ControllerDigital::right)) {
-			if (backClampToggle) {
-				backClampToggle = false;
-				piston(tilt, true, true);
-				pros::delay(450);
-				piston(backClamp, true, false);
+			if (backClampHeld == false) {
+				backClampHeld = true;
+				if (backClampToggle) {
+					backClampToggle = false;
+					piston(tilt, true, true);
+					pros::delay(450);
+					piston(backClamp, true, false);
+				}
+				else {
+					backClampToggle = true;
+					piston(backClamp, true, true);
+					pros::delay(250);
+					piston(tilt, true, false);
+				}
 			}
-			else {
-				backClampToggle = true;
-				piston(backClamp, true, true);
-				pros::delay(250);
-				piston(tilt, true, false);
-			}
+		}
+		else {
+			backClampHeld = false;
 		}
 
 		// MISC stuff
 		// swiper
 		if(driver.getDigital(ControllerDigital::down) || partner.getDigital(ControllerDigital::down)) {
-			if (swiperToggle) {
-				swiperToggle = false;
-				piston(swiper, false, true);
-				pros::delay(200);
+			if (swiperHeld == false) {
+				swiperHeld = true;
+				if (swiperToggle) {
+					swiperToggle = false;
+					piston(swiper, false, true);
+					pros::delay(100);
+				}
+				else {
+					swiperToggle = true;
+					piston(swiper, false, false);
+					pros::delay(100);
+				}
 			}
-			else {
-				swiperToggle = true;
-				piston(swiper, false, false);
-				pros::delay(200);
-			}
+		}
+		else {
+			swiperHeld = false;
 		}
 		// auto clamp
 		if(partner.getDigital(ControllerDigital::A) && frontBumper.isPressed() && !frontClampToggle) {
