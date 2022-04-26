@@ -62,6 +62,22 @@ void auton_swiper(void* delay) {
     piston(swiper, false, false);
 }
 
+void auton_lift() {
+	piston(frontClamp, true, false);
+	lift.moveVelocity(100);
+	pros::delay(100);
+	lift.moveVelocity(0);
+	pros::delay(150);
+	intake.moveVelocity(600);
+	pros::delay(300);
+	intake.moveVelocity(0);
+	lift.moveVelocity(-100);
+	pros::delay(100);
+	lift.moveVelocity(0);
+	pros::delay(200);
+    piston(swiper, false, false);
+}
+
 
 void initialize() {
 	selector::init();
@@ -197,7 +213,7 @@ void right() {
 }
 
 void left_middle() {
-	pros::Task activate_pistons(auton_front_clamp, (void*)1290);
+	pros::Task activate_pistons(auton_lift);
 	whole_drive(600);
 	pros::delay(1200);
 	whole_drive(-600);
