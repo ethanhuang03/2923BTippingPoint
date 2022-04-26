@@ -14,7 +14,7 @@ Motor backLeftDrive(-1);
 Motor frontLeftDrive(-2);
 Motor topLeftDrive(-3);
 Motor intake(-8);
-Motor lift(-7);
+Motor lift(7);
 
 MotorGroup RightDrive({frontRightDrive, backRightDrive, topRightDrive});
 MotorGroup LeftDrive({frontLeftDrive, backLeftDrive, topLeftDrive});
@@ -197,9 +197,9 @@ void right() {
 }
 
 void left_middle() {
-	pros::Task activate_pistons(auton_front_clamp, (void*)1190);
+	pros::Task activate_pistons(auton_front_clamp, (void*)1290);
 	whole_drive(600);
-	pros::delay(1100);
+	pros::delay(1200);
 	whole_drive(-600);
 	pros::delay(300);
 	if (frontBumper.isPressed()) {
@@ -457,7 +457,6 @@ void opcontrol() {
 		if(partner.getDigital(ControllerDigital::A)) {
 			if(brakeToggle) {
 				brakeToggle = false;
-				driver = master;
 				LeftDrive.setBrakeMode(AbstractMotor::brakeMode::coast);
 				RightDrive.setBrakeMode(AbstractMotor::brakeMode::coast);				
 				pros::delay(200);
@@ -466,7 +465,6 @@ void opcontrol() {
 				brakeToggle = true;
 				LeftDrive.setBrakeMode(AbstractMotor::brakeMode::hold);
 				RightDrive.setBrakeMode(AbstractMotor::brakeMode::hold);
-				driver = partner;
 				LeftDrive.moveVelocity(0);
 				RightDrive.moveVelocity(0);
 				pros::delay(200);
