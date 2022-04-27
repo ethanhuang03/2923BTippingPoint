@@ -90,7 +90,7 @@ void intake_switcher(bool toggle) {
 			}
 			else {
 				intakeDirection = 1;
-				intake.moveVelocity(600);
+				intake.moveVelocity(-600);
 				pros::delay(250);
 			}
 		}
@@ -102,17 +102,17 @@ void intake_switcher(bool toggle) {
 			}
 			else {
 				intakeDirection = -1;
-				intake.moveVelocity(-600);
+				intake.moveVelocity(600);
 				pros::delay(250);
 			}
 		}
 	}
 	else{
 		if(driver.getDigital(ControllerDigital::L1) || partner.getDigital(ControllerDigital::L1)) {
-			intake.moveVelocity(600);
+			intake.moveVelocity(-600);
 		}
 		else if(driver.getDigital(ControllerDigital::L2) || partner.getDigital(ControllerDigital::L2)) {
-			intake.moveVelocity(-600);
+			intake.moveVelocity(600);
 		}
 		else {
 			intake.moveVelocity(0);
@@ -130,7 +130,7 @@ void tank_drive(Controller controller) {
 	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
 }
 
-void arcade_drive(Controller controller) {
+void     (Controller controller) {
 	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightX));
 }
 
@@ -336,10 +336,10 @@ void opcontrol() {
 		// Front Goal related stuff on the right hand
 		// lift
 		if(driver.getDigital(ControllerDigital::R1) || partner.getDigital(ControllerDigital::R1)) {
-			lift.moveVelocity(100);
+			lift.moveVelocity(-100);
 		}
 		else if(driver.getDigital(ControllerDigital::R2) || partner.getDigital(ControllerDigital::R2)) {
-			lift.moveVelocity(-100);
+			lift.moveVelocity(100);
 		}
 		else {
 			lift.moveVelocity(0);
