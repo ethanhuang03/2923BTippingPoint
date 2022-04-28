@@ -13,8 +13,8 @@ Motor topRightDrive(6);
 Motor backLeftDrive(-1);
 Motor frontLeftDrive(-2);
 Motor topLeftDrive(-3);
-Motor intake(-8);
-Motor lift(7);
+Motor intake(8);
+Motor lift(-7);
 
 MotorGroup RightDrive({frontRightDrive, backRightDrive, topRightDrive});
 MotorGroup LeftDrive({frontLeftDrive, backLeftDrive, topLeftDrive});
@@ -28,6 +28,14 @@ pros::ADIDigitalOut swiper('C');
 
 bool intake_toggle = false;
 int intakeDirection = 0;
+bool backClampToggle = false;
+bool backClampHeld = false;
+bool frontClampToggle = true;
+bool frontClampHeld = false;
+bool swiperToggle = false;
+bool swiperHeld = false;
+bool driverToggle = false;
+bool brakeToggle = false; 
 
 
 void piston(pros::ADIDigitalOut piston, bool intially_extended, bool extend) {
@@ -54,6 +62,18 @@ void auton_front_clamp(void* delay) {
 	piston(frontClamp, true, false);
 	pros::delay((int)delay);
     piston(frontClamp, true, true);
+	frontClampToggle = true;
+
+}
+
+void open_front_clamp() {
+	piston(frontClamp, true, false);
+	frontClampToggle = false;
+}
+
+void close_front_clamp() {
+	piston(frontClamp, true, true);
+	frontClampToggle = true;
 }
 
 void auton_swiper(void* delay) {
@@ -130,9 +150,6 @@ void tank_drive(Controller controller) {
 	drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
 }
 
-void     (Controller controller) {
-	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightX));
-}
 
 void whole_drive(int velocity) {
 	backRightDrive.moveVelocity(velocity);
@@ -143,11 +160,13 @@ void whole_drive(int velocity) {
 	topLeftDrive.moveVelocity(velocity);
 }
 
+
 void left_drive(int velocity) {
 	backLeftDrive.moveVelocity(velocity);
 	frontLeftDrive.moveVelocity(velocity);
 	topLeftDrive.moveVelocity(velocity);
 }
+
 
 void right_drive(int velocity) {
 	backRightDrive.moveVelocity(velocity);
@@ -155,45 +174,44 @@ void right_drive(int velocity) {
 	topRightDrive.moveVelocity(velocity);
 }
 
+
 void left() {
-	pros::Task activate_pistons(auton_front_clamp, (void*)890);
+	pros::Task activate_pistons(open_front_clamp);
 	whole_drive(600);
-	pros::delay(800);
-	whole_drive(-600);
-	pros::delay(300);
-	if (frontBumper.isPressed()) {
-		while (topRightDrive.getActualVelocity() > -500) {
-			pros::delay(10);
+	for (int i = 0; i < 100; i++) {
+		if (frontBumper.isPressed()) {
+			pros::Task activate_pistons(close_front_clamp);
+			whole_drive(-600);
+			while (topRightDrive.getActualVelocity() > -500) {
+				pros::delay(10);
+			}
+			pros::delay(200);
+			whole_drive(0);
+			break;
 		}
-		pros::delay(200);
-		whole_drive(0);
+		pros::delay(10);
 	}
-	else {
-		whole_drive(600);
-		pros::delay(50);
-		whole_drive(0);
-	}
+	whole_drive(0);
 }
 
 
 void right() {
-	pros::Task activate_pistons(auton_front_clamp, (void*)890);
+	pros::Task activate_pistons(open_front_clamp);
 	whole_drive(600);
-	pros::delay(800);
-	whole_drive(-600);
-	pros::delay(300);
-	if (frontBumper.isPressed()) {
-		while (topRightDrive.getActualVelocity() > -500) {
-			pros::delay(10);
+	for (int i = 0; i < 100; i++) {
+		if (frontBumper.isPressed()) {
+			pros::Task activate_pistons(close_front_clamp);
+			whole_drive(-600);
+			while (topRightDrive.getActualVelocity() > -500) {
+				pros::delay(10);
+			}
+			pros::delay(200);
+			whole_drive(0);
+			break;
 		}
-		pros::delay(200);
-		whole_drive(0);
+		pros::delay(10);
 	}
-	else {
-		whole_drive(600);
-		pros::delay(50);
-		whole_drive(0);
-	}
+	whole_drive(0);
 }
 
 void left_middle() {
@@ -207,23 +225,22 @@ void left_middle() {
 
 
 void right_middle() {
-	pros::Task activate_pistons(auton_front_clamp, (void*)1005);
+	pros::Task activate_pistons(open_front_clamp);
 	whole_drive(600);
-	pros::delay(915);
-	whole_drive(-600);
-	pros::delay(300);
-	if (frontBumper.isPressed()) {
-		while (topRightDrive.getActualVelocity() > -500) {
-			pros::delay(10);
+	for (int i = 0; i < 110; i++) {
+		if (frontBumper.isPressed()) {
+			pros::Task activate_pistons(close_front_clamp);
+			whole_drive(-600);
+			while (topRightDrive.getActualVelocity() > -500) {
+				pros::delay(10);
+			}
+			pros::delay(350);
+			whole_drive(0);
+			break;
 		}
-		pros::delay(200);
-		whole_drive(0);
+		pros::delay(10);
 	}
-	else {
-		whole_drive(600);
-		pros::delay(50);
-		whole_drive(0);
-	}
+	whole_drive(0);
 }
 
 
@@ -234,6 +251,7 @@ void swiper_left() {
 	right_drive(-400);
 	pros::delay(400);
 	piston(frontClamp, true, false);
+	frontClampToggle = false;
 	whole_drive(0);
 	pros::delay(300);
 	right_drive(-600);
@@ -244,6 +262,7 @@ void swiper_left() {
 	pros::delay(500);
 	if (frontBumper.isPressed()) {
 		piston(frontClamp, true, true);
+		frontClampToggle = true;
 		right_drive(600);
 		left_drive(-600);
 		pros::delay(150);
@@ -260,20 +279,21 @@ void swiper_right() {
 	pros::delay(500);
 	left_drive(-400);
 	pros::delay(600);
-	piston(frontClamp, true, false);
-	whole_drive(400);
-	pros::delay(300);
-	whole_drive(0);
-	pros::delay(500);
-	if (frontBumper.isPressed()) {
-		piston(frontClamp, true, true);
-		right_drive(-600);
-		left_drive(600);
-		pros::delay(80);
-		whole_drive(-600);
-		pros::delay(700);
-		whole_drive(0);
+	pros::Task frontclamp(open_front_clamp);
+	whole_drive(600);
+	for (int i = 0; i < 60; i++) {
+		if (frontBumper.isPressed()) {
+			pros::Task fontclamp1(close_front_clamp);
+			right_drive(-600);
+			pros::delay(200);
+			whole_drive(-600);
+			pros::delay(300);
+			whole_drive(0);
+			break;
+		}
+		pros::delay(10);
 	}
+	whole_drive(0);
 }
 
 
@@ -320,14 +340,6 @@ void autonomous() {
 
 
 void opcontrol() {
-	bool backClampToggle = false;
-	bool backClampHeld = false;
-	bool frontClampToggle = false;
-	bool frontClampHeld = false;
-	bool swiperToggle = false;
-	bool swiperHeld = false;
-	bool driverToggle = false;
-	bool brakeToggle = false; 
 	printf("hi");
 	driver = master;
 	while(true){
