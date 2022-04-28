@@ -191,7 +191,11 @@ void left() {
 		}
 		pros::delay(10);
 	}
-	whole_drive(0);
+	if (!frontBumper.isPressed()) {
+		whole_drive(-600);
+		pros::delay(300);
+		whole_drive(0);
+	}
 }
 
 
@@ -211,8 +215,13 @@ void right() {
 		}
 		pros::delay(10);
 	}
-	whole_drive(0);
+	if (!frontBumper.isPressed()) {
+		whole_drive(-600);
+		pros::delay(300);
+		whole_drive(0);
+	}
 }
+
 
 void left_middle() {
 	pros::Task activate_pistons(auton_swiper, (void*)2000);
@@ -240,7 +249,11 @@ void right_middle() {
 		}
 		pros::delay(10);
 	}
-	whole_drive(0);
+	if (!frontBumper.isPressed()) {
+		whole_drive(-600);
+		pros::delay(300);
+		whole_drive(0);
+	}
 }
 
 
@@ -250,24 +263,28 @@ void swiper_left() {
 	pros::delay(600);
 	right_drive(-400);
 	pros::delay(400);
-	piston(frontClamp, true, false);
-	frontClampToggle = false;
+	pros::Task frontclamp(open_front_clamp);
 	whole_drive(0);
 	pros::delay(300);
 	right_drive(-600);
 	pros::delay(100);
 	whole_drive(600);
-	pros::delay(500);
-	whole_drive(0);
-	pros::delay(500);
-	if (frontBumper.isPressed()) {
-		piston(frontClamp, true, true);
-		frontClampToggle = true;
-		right_drive(600);
-		left_drive(-600);
-		pros::delay(150);
+	for (int i = 0; i < 60; i++) {
+		if (frontBumper.isPressed()) {
+			pros::Task frontclamp1(close_front_clamp);
+			right_drive(600);
+			left_drive(-600);
+			pros::delay(200);
+			whole_drive(-600);
+			pros::delay(600);
+			whole_drive(0);
+			break;
+		}
+		pros::delay(10);
+	}
+	if (!frontBumper.isPressed()) {
 		whole_drive(-600);
-		pros::delay(600);
+		pros::delay(300);
 		whole_drive(0);
 	}
 }
@@ -287,13 +304,17 @@ void swiper_right() {
 			right_drive(-600);
 			pros::delay(200);
 			whole_drive(-600);
-			pros::delay(300);
+			pros::delay(600);
 			whole_drive(0);
 			break;
 		}
 		pros::delay(10);
 	}
-	whole_drive(0);
+	if (!frontBumper.isPressed()) {
+		whole_drive(-600);
+		pros::delay(300);
+		whole_drive(0);
+	}
 }
 
 
