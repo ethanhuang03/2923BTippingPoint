@@ -318,6 +318,57 @@ void swiper_right() {
 }
 
 
+void swiper_alliance_right() {
+	pros::Task activate_pistons(auton_swiper, (void*)5030);
+	whole_drive(600);
+	pros::delay(530);
+	left_drive(-400);
+	pros::delay(600);
+	pros::Task frontclamp(open_front_clamp);
+	whole_drive(600);
+	for (int i = 0; i < 63; i++) {
+		if (frontBumper.isPressed()) {
+			pros::Task fontclamp1(close_front_clamp);
+			right_drive(-600);
+			pros::delay(230);
+			whole_drive(-600);
+			pros::delay(600);
+			whole_drive(0);
+			break;
+		}
+		pros::delay(10);
+	}
+	if (!frontBumper.isPressed()) {
+		whole_drive(-600);
+		pros::delay(300);
+		whole_drive(0);
+	}
+}
+
+void alliance_right() {
+	pros::Task activate_pistons(open_front_clamp);
+	whole_drive(600);
+	for (int i = 0; i < 110; i++) {
+		if (frontBumper.isPressed()) {
+			pros::Task activate_pistons(close_front_clamp);
+			whole_drive(-600);
+			while (topRightDrive.getActualVelocity() > -500) {
+				pros::delay(10);
+			}
+			pros::delay(200);
+			whole_drive(0);
+			break;
+		}
+		pros::delay(10);
+	}
+	if (!frontBumper.isPressed()) {
+		whole_drive(-600);
+		pros::delay(300);
+		whole_drive(0);
+	}
+}
+
+
 void autonomous() {
 	piston(backClamp, true, false);
 	
@@ -339,16 +390,22 @@ void autonomous() {
 	else if(selector::auton == 6) { // swiper (Right)
 		swiper_right();
 	}
-	else if(selector::auton == 1) { // Blue Left
+	else if(selector::auton == 7) {
+		swiper_alliance_right();
+	}
+	else if(selector::auton == 8) {
+		alliance_right();
+	}
+	else if(selector::auton == -1) { // Blue Left
 		left();
 	}
-	else if(selector::auton == 2) { // Blue Right
+	else if(selector::auton == -2) { // Blue Right
 		right();
 	}
-	else if(selector::auton == 3) { // Blue Middle (From Left)
+	else if(selector::auton == -3) { // Blue Middle (From Left)
 		left_middle();
 	}
-	else if(selector::auton == 4) { // Blue Middle (From Right)
+	else if(selector::auton == -4) { // Blue Middle (From Right)
 		right_middle();
 	}
 	else if(selector::auton == -5) { // swiper (Left)
@@ -356,6 +413,12 @@ void autonomous() {
 	}
 	else if(selector::auton == -6) { // swiper (Right)
 		swiper_right();
+	}
+	else if(selector::auton == -7) {
+		swiper_alliance_right();
+	}
+	else if(selector::auton == -8) {
+		alliance_right();
 	}
 }
 
