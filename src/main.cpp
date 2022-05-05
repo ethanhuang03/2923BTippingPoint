@@ -175,51 +175,67 @@ void right_drive(int velocity) {
 }
 
 
-void left() {
+void grab_and_dash(int time_forward, int time_backwards) {
 	pros::Task activate_pistons(open_front_clamp);
 	whole_drive(600);
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < time_forward; i++) {
 		if (frontBumper.isPressed()) {
 			pros::Task activate_pistons(close_front_clamp);
 			whole_drive(-600);
-			while (topRightDrive.getActualVelocity() > -500) {
-				pros::delay(10);
+			pros::delay(100);
+			if (frontBumper.isPressed()) {
+				while (topRightDrive.getActualVelocity() > -500) {
+					pros::delay(10);
+				}
+				pros::delay(time_backwards);
+				whole_drive(0);
 			}
-			pros::delay(200);
-			whole_drive(0);
+			else {
+				whole_drive(600);
+				pros::delay(200);
+			}
 			break;
 		}
 		pros::delay(10);
 	}
 	if (!frontBumper.isPressed()) {
 		whole_drive(-600);
-		pros::delay(300);
-		whole_drive(0);
+		pros::delay(200);
 	}
+	whole_drive(0);
+}
+
+
+void grab_and_dash_swiper(int time_forward, int time_backwards) {
+	pros::Task activate_pistons(open_front_clamp);
+	whole_drive(600);
+	for (int i = 0; i < time_forward; i++) {
+		if (frontBumper.isPressed()) {
+			pros::Task activate_pistons(close_front_clamp);
+			whole_drive(0);
+			pros::delay(500);
+			if(frontBumper.isPressed()) {
+				whole_drive(-600);
+				pros::delay(time_backwards);
+				whole_drive(0);
+				break;
+			}
+			break;
+			
+		}
+		pros::delay(10);
+	}
+	whole_drive(0);
+}
+
+
+void left() {
+	grab_and_dash(110, 450);
 }
 
 
 void right() {
-	pros::Task activate_pistons(open_front_clamp);
-	whole_drive(600);
-	for (int i = 0; i < 100; i++) {
-		if (frontBumper.isPressed()) {
-			pros::Task activate_pistons(close_front_clamp);
-			whole_drive(-600);
-			while (topRightDrive.getActualVelocity() > -500) {
-				pros::delay(10);
-			}
-			pros::delay(200);
-			whole_drive(0);
-			break;
-		}
-		pros::delay(10);
-	}
-	if (!frontBumper.isPressed()) {
-		whole_drive(-600);
-		pros::delay(300);
-		whole_drive(0);
-	}
+	grab_and_dash(100, 400);
 }
 
 
@@ -234,49 +250,34 @@ void left_middle() {
 
 
 void right_middle() {
-	pros::Task activate_pistons(open_front_clamp);
-	whole_drive(600);
-	for (int i = 0; i < 110; i++) {
-		if (frontBumper.isPressed()) {
-			pros::Task activate_pistons(close_front_clamp);
-			whole_drive(-600);
-			while (topRightDrive.getActualVelocity() > -500) {
-				pros::delay(10);
-			}
-			pros::delay(350);
-			whole_drive(0);
-			break;
-		}
-		pros::delay(10);
-	}
-	if (!frontBumper.isPressed()) {
-		whole_drive(-600);
-		pros::delay(300);
-		whole_drive(0);
-	}
+	grab_and_dash(125, 250);
 }
 
 
 void swiper_left() {
-	pros::Task activate_pistons(auton_swiper, (void*)1200);
+	pros::Task activate_pistons(auton_swiper, (void*)1100);
 	whole_drive(600);
-	pros::delay(600);
-	right_drive(-400);
-	pros::delay(400);
+	pros::delay(620);
+	right_drive(-300);
+	pros::delay(550);
 	pros::Task frontclamp(open_front_clamp);
 	whole_drive(0);
 	pros::delay(300);
-	right_drive(-600);
-	pros::delay(100);
+	right_drive(-500);
+	pros::delay(70);
 	whole_drive(600);
-	for (int i = 0; i < 60; i++) {
+	for (int i = 0; i < 90; i++) {
 		if (frontBumper.isPressed()) {
 			pros::Task frontclamp1(close_front_clamp);
-			right_drive(600);
-			left_drive(-600);
-			pros::delay(200);
-			whole_drive(-600);
-			pros::delay(600);
+			whole_drive(0);
+			pros::delay(500);			
+			if (frontBumper.isPressed()) {
+				right_drive(600);
+				left_drive(-600);
+				pros::delay(250);
+				whole_drive(-600);
+				pros::delay(600);
+			}
 			whole_drive(0);
 			break;
 		}
@@ -293,30 +294,21 @@ void swiper_left() {
 void swiper_right() {
 	pros::Task activate_pistons(auton_swiper, (void*)5000);
 	whole_drive(600);
-	pros::delay(500);
-	left_drive(-400);
-	pros::delay(600);
-	pros::Task frontclamp(open_front_clamp);
-	whole_drive(600);
-	for (int i = 0; i < 60; i++) {
-		if (frontBumper.isPressed()) {
-			pros::Task fontclamp1(close_front_clamp);
-			right_drive(-600);
-			pros::delay(200);
-			whole_drive(-600);
-			pros::delay(600);
-			whole_drive(0);
-			break;
-		}
-		pros::delay(10);
-	}
-	if (!frontBumper.isPressed()) {
-		whole_drive(-600);
-		pros::delay(300);
-		whole_drive(0);
-	}
+	pros::delay(490);
+	left_drive(-300);
+	pros::delay(300);
+	grab_and_dash_swiper(60, 700);
 }
 
+void swiper_right_middle() {
+	pros::Task activate_pistons(auton_swiper, (void*)5000);
+	whole_drive(600);
+	pros::delay(720);
+	left_drive(-600);
+	pros::delay(600);
+	whole_drive(0);
+	pros::delay(500);
+}
 
 void swiper_alliance_right() {
 	pros::Task activate_pistons(auton_swiper, (void*)5030);
@@ -390,22 +382,25 @@ void autonomous() {
 	else if(selector::auton == 6) { // swiper (Right)
 		swiper_right();
 	}
-	else if(selector::auton == 7) {
+	else if(selector::auton == 7) { // swiper from right to middle goal
+		swiper_right_middle();
+	}
+	else if(selector::auton == 8) { // swiper from right to middle goal
 		swiper_alliance_right();
 	}
-	else if(selector::auton == 8) {
+	else if(selector::auton == 9) { // swiper from right to middle goal
 		alliance_right();
 	}
-	else if(selector::auton == -1) { // Blue Left
+	else if(selector::auton == 1) { // Blue Left
 		left();
 	}
-	else if(selector::auton == -2) { // Blue Right
+	else if(selector::auton == 2) { // Blue Right
 		right();
 	}
-	else if(selector::auton == -3) { // Blue Middle (From Left)
+	else if(selector::auton == 3) { // Blue Middle (From Left)
 		left_middle();
 	}
-	else if(selector::auton == -4) { // Blue Middle (From Right)
+	else if(selector::auton == 4) { // Blue Middle (From Right)
 		right_middle();
 	}
 	else if(selector::auton == -5) { // swiper (Left)
@@ -414,17 +409,19 @@ void autonomous() {
 	else if(selector::auton == -6) { // swiper (Right)
 		swiper_right();
 	}
-	else if(selector::auton == -7) {
+	else if(selector::auton == -7) { // swiper from right to middle goal
+		swiper_right_middle();
+	}
+	else if(selector::auton == -8) { // swiper from right to middle goal
 		swiper_alliance_right();
 	}
-	else if(selector::auton == -8) {
+	else if(selector::auton == -9) { // swiper from right to middle goal
 		alliance_right();
 	}
 }
 
 
 void opcontrol() {
-	printf("hi");
 	driver = master;
 	while(true){
 		tank_drive(driver);
